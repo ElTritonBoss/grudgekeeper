@@ -24,6 +24,7 @@
 // faction is permitted to have are listed with "unverified": true.
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const args = process.argv.slice(2);
@@ -33,7 +34,12 @@ if (!inputDir) {
     console.error("Usage: node scripts/build-lord-details.mjs <export folder> [output file] [races.csv] [--all-skills]");
     process.exit(1);
 }
-const outputFile = outputArg ?? "lord-details.json";
+// Always written to the app's data folder (must match LOCAL_DIR in electron-main.js),
+// where the Dashboard picks it up; an output file argument writes an extra copy.
+const appData = process.env.APPDATA ?? (process.platform === "darwin"
+    ? path.join(os.homedir(), "Library", "Application Support")
+    : path.join(os.homedir(), ".config"));
+const appDetailsFile = path.join(appData, "Grudgekeeper", "lord-details.json");
 const racesFile = racesArg ?? "public/data/races.csv";
 
 const SKIP = /_(prologue|test|pro\d+)_/;
@@ -569,7 +575,10 @@ for (const c of candidates) {
 }
 if (extra) console.log(`Added ${extra} starting lords the app doesn't list (keyed by agent subtype).`);
 
-fs.writeFileSync(outputFile, JSON.stringify({ format: "grudgekeeper-lord-details", version: 1, generated: new Date().toISOString(), lords }, null, 1));
+const json = JSON.stringify({ format: "grudgekeeper-lord-details", version: 1, generated: new Date().toISOString(), lords }, null, 1);
+fs.mkdirSync(path.dirname(appDetailsFile), { recursive: true });
+fs.writeFileSync(appDetailsFile, json);
+if (outputArg) fs.writeFileSync(outputArg, json);
 
-console.log(`Wrote ${Object.keys(lords).length} lords to ${outputFile}.`);
+console.log(`Wrote ${Object.keys(lords).length} lords to ${appDetailsFile}${outputArg ? ` and ${outputArg}` : ""}.`);
 if (unmatched.length) console.log(`No match in the game data for ${unmatched.length}: ${unmatched.join(", ")}`);

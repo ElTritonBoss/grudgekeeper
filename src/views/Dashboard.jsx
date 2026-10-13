@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { load, save } from "../hooks/usePersist";
 import { useTheme } from "../context/ThemeContext";
 import { isDone, VICTORIES, VICTORY_COLORS } from "../utils/constants";
@@ -7,6 +7,7 @@ import PressureBadge from "../components/PressureBadge";
 
 const DAY = 24 * 60 * 60 * 1000;
 const DETAILS_KEY = "tww3_lordDetails";
+const LOCAL_DETAILS_URL = "/local/lord-details.json";
 
 function sinceText(at) {
     if (!at) return null;
@@ -75,9 +76,8 @@ function SessionLog({ entries, onAdd, onDelete, color }) {
     );
 }
 
-function LordDetails({ lord, details, color, onLoad, error }) {
+function LordDetails({ lord, details, color }) {
     const t = useTheme();
-    const fileInput = useRef(null);
     const panel = { background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" };
 
     if (!details) {
@@ -86,11 +86,8 @@ function LordDetails({ lord, details, color, onLoad, error }) {
                 <Label color={color}>Skill tree &amp; legendary heroes</Label>
                 <div style={{ fontSize: 13, color: t.text3, lineHeight: 1.65 }}>
                     Which units {lord}'s skills buff and which legendary heroes you can unlock come from your own copy of the game.
-                    Build <code>lord-details.json</code> with the refresh script, then load it here. It stays on this PC.
+                    Run <code>scripts\refresh-game-data.ps1</code> once and they'll show up here. The data stays on this PC.
                 </div>
-                <button onClick={() => fileInput.current?.click()} style={{ fontSize: 12, padding: "7px 16px", borderRadius: 8, cursor: "pointer", background: `${color}18`, border: `1px solid ${color}60`, color, fontFamily: "inherit" }}>Load lord details file</button>
-                {error && <div style={{ fontSize: 12, color: "#e06050" }}>{error}</div>}
-                <input ref={fileInput} type="file" accept=".json,application/json" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) onLoad(f); }} style={{ display: "none" }} />
             </div>
         );
     }
@@ -146,7 +143,7 @@ function Label({ children, color }) {
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, detailsError, onLoadDetails, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
@@ -224,7 +221,7 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, d
                         </div>
                         {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
                     </div>
-                    {active && <LordDetails lord={camp.lord} details={details} color={rc} onLoad={onLoadDetails} error={detailsError} />}
+                    {active && <LordDetails lord={camp.lord} details={details} color={rc} />}
                 </div>
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16 }}>
@@ -280,20 +277,21 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
 
     const start = (id) => setActiveCampaign(id);
 
-    // Skill-tree and hero details come from a file built from your own game install.
+    // Skill-tree and hero details come from a file built from your own game install
+    // (scripts/refresh-game-data.ps1), picked up from the app's data folder.
     const [lordDetails, setLordDetails] = useState(() => load(DETAILS_KEY, null));
-    const [detailsError, setDetailsError] = useState(null);
-    const importDetails = (file) => {
-        file.text().then((text) => {
-            const data = JSON.parse(text);
-            if (data.format !== "grudgekeeper-lord-details" || typeof data.lords !== "object") {
-                throw new Error("This isn't a lord details file.");
-            }
-            save(DETAILS_KEY, data);
-            setLordDetails(data);
-            setDetailsError(null);
-        }).catch((err) => setDetailsError(err.message));
-    };
+    useEffect(() => {
+        fetch(LOCAL_DETAILS_URL, { cache: "no-store" })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (data?.format !== "grudgekeeper-lord-details" || typeof data.lords !== "object") return;
+                const cached = load(DETAILS_KEY, null);
+                if (cached && cached.generated === data.generated) return;
+                save(DETAILS_KEY, data);
+                setLordDetails(data);
+            })
+            .catch(() => {});
+    }, []);
 
     // Session log entries are kept per lord, newest first.
     const addLog = (text, turn) => {
@@ -350,8 +348,6 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     onLogAdd={addLog}
                     onLogDelete={deleteLog}
                     details={lordDetails?.lords?.[heroCamp.lordId] ?? (lordDetails ? {} : null)}
-                    detailsError={detailsError}
-                    onLoadDetails={importDetails}
                     onComplete={complete}
                     onEnd={() => setActiveCampaign(null)}
                     onStart={() => start(heroCamp.id)}

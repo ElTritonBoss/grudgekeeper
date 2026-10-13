@@ -4,26 +4,29 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-// Same location electron-main.js serves the unit lore file from.
+// Same location electron-main.js serves the local game-data files from.
 const appData = process.env.APPDATA ?? (process.platform === "darwin"
   ? path.join(os.homedir(), "Library", "Application Support")
   : path.join(os.homedir(), ".config"));
-const unitLoreFile = path.join(appData, "Grudgekeeper", "unit-lore.json");
+const localDir = path.join(appData, "Grudgekeeper");
 
-function localUnitLore() {
+function localGameData() {
   return {
-    name: "local-unit-lore",
+    name: "local-game-data",
     configureServer(server) {
-      server.middlewares.use("/local/unit-lore.json", (req, res) => {
-        if (!fs.existsSync(unitLoreFile)) { res.statusCode = 404; return res.end(); }
-        res.setHeader("Content-Type", "application/json");
-        fs.createReadStream(unitLoreFile).pipe(res);
+      ["unit-lore.json", "lord-details.json"].forEach((name) => {
+        server.middlewares.use(`/local/${name}`, (req, res) => {
+          const file = path.join(localDir, name);
+          if (!fs.existsSync(file)) { res.statusCode = 404; return res.end(); }
+          res.setHeader("Content-Type", "application/json");
+          fs.createReadStream(file).pipe(res);
+        });
       });
     },
   };
 }
 
 export default defineConfig({
-  plugins: [react(), localUnitLore()],
+  plugins: [react(), localGameData()],
   base: "./",
 });
