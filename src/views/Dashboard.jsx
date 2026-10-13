@@ -3,29 +3,19 @@ import { isDone, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
 import Tag from "../components/Tag";
 
-export default function Dashboard({ roadmap, checked, activeCampaign, setActiveCampaign }) {
+export default function Dashboard({ roadmap, campaigns, checked, activeCampaign, setActiveCampaign }) {
     const t = useTheme();
 
-    const allEntries = roadmap.flatMap((tier) =>
-        tier.entries.map((e) => ({ ...e, tierColor: tier.tierColor, tierLabel: tier.tierLabel }))
-    );
-    const getKey = (entry) => {
-        const tier = roadmap.find((r) => r.tier === entry.tier);
-        return `${entry.tier}-${tier.entries.findIndex((x) => x.id === entry.id)}`;
-    };
+    const allEntries = campaigns;
+    const getKey = (entry) => entry.lordId;
 
-    const done = Object.values(checked).filter(isDone).length;
+    const done = allEntries.filter((e) => isDone(checked[getKey(e)])).length;
     const total = allEntries.length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
-    const suggested = allEntries.find((e) => {
-        const key = getKey(e);
-        if (isDone(checked[key])) return false;
-        const tierIdx = roadmap.findIndex((r) => r.tier === e.tier);
-        if (tierIdx === 0) return true;
-        const prev = roadmap[tierIdx - 1];
-        return prev.entries.every((_, i) => isDone(checked[`${prev.tier}-${i}`]));
-    }) || allEntries.find((e) => !isDone(checked[getKey(e)]));
+    // The easiest faction card still open on the roadmap.
+    const suggested = roadmap.flatMap((r) => r.entries).find((e) => !e.complete);
+    const currentTier = roadmap.find((r) => r.entries.some((e) => !e.complete));
 
     const currentCamp = allEntries.find((e) => e.id === activeCampaign);
 
@@ -40,8 +30,8 @@ export default function Dashboard({ roadmap, checked, activeCampaign, setActiveC
                     { label: "Progress", value: `${pct}%`, sub: "of the full Roadmap", color: "#facc15" },
                     {
                         label: "Current Tier",
-                        value: roadmap.find((r) => r.entries.some((_, i) => !isDone(checked[`${r.tier}-${i}`])))?.tier ?? "✓",
-                        sub: roadmap.find((r) => r.entries.some((_, i) => !isDone(checked[`${r.tier}-${i}`])))?.tierLabel ?? "All done!",
+                        value: currentTier?.tier ?? "✓",
+                        sub: currentTier?.tierLabel ?? "All done!",
                         color: "#f97316",
                     },
                     { label: "Remaining", value: total - done, sub: "campaigns left", color: "#c084fc" },
@@ -58,15 +48,16 @@ export default function Dashboard({ roadmap, checked, activeCampaign, setActiveC
                 <div style={{ background: t.bg3, border: `1px solid ${t.border}`, borderRadius: 10, padding: "18px 20px" }}>
                     <div style={{ fontSize: 10, color: t.text4, letterSpacing: 2, textTransform: "uppercase", marginBottom: 14 }}>Tier Progress</div>
                     {roadmap.map((r) => {
-                        const d = r.entries.filter((_, i) => isDone(checked[`${r.tier}-${i}`])).length;
+                        const lords = allEntries.filter((e) => e.tier === r.tier);
+                        const d = lords.filter((e) => isDone(checked[getKey(e)])).length;
                         return (
                             <div key={r.tier} style={{ marginBottom: 11 }}>
                                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
                                     <span style={{ color: t.text2 }}>{r.tierLabel}</span>
-                                    <span style={{ color: r.tierColor }}>{d}/{r.entries.length}</span>
+                                    <span style={{ color: r.tierColor }}>{d}/{lords.length} lords</span>
                                 </div>
                                 <div style={{ background: t.bg2, borderRadius: 3, height: 4, overflow: "hidden" }}>
-                                    <div style={{ height: "100%", width: `${(d / r.entries.length) * 100}%`, background: r.tierColor, transition: "width 0.5s", borderRadius: 3 }} />
+                                    <div style={{ height: "100%", width: `${lords.length ? (d / lords.length) * 100 : 0}%`, background: r.tierColor, transition: "width 0.5s", borderRadius: 3 }} />
                                 </div>
                             </div>
                         );

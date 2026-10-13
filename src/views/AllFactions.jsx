@@ -1,37 +1,36 @@
 import { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { save } from "../hooks/usePersist";
+import { PROGRESS_KEY } from "../utils/progress";
 import { isDone, getVictory, getKills, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
 import Tag from "../components/Tag";
 
-export default function AllFactions({ roadmap, checked, setChecked, activeCampaign, setActiveCampaign }) {
+export default function AllFactions({ campaigns, checked, setChecked, activeCampaign, setActiveCampaign }) {
     const t = useTheme();
     const [filter, setFilter] = useState("alle");
-    const [sortBy, setSortBy] = useState("tier");
+    const [sortBy, setSortBy] = useState("faction");
     const [victoryModal, setVictoryModal] = useState(null);
 
-    const allEntries = roadmap.flatMap((tier) =>
-        tier.entries.map((e) => ({ ...e, tierColor: tier.tierColor, tierLabel: tier.tierLabel }))
-    );
-    const getKey = (entry) => {
-        const tier = roadmap.find((r) => r.tier === entry.tier);
-        return `${entry.tier}-${tier.entries.findIndex((x) => x.id === entry.id)}`;
-    };
+    const allEntries = campaigns;
+    const getKey = (entry) => entry.lordId;
 
     const completeWithVictory = (key, victory) => {
         setChecked((p) => {
             const n = { ...p, [key]: { done: true, victory } };
-            save("tww3_checked", n);
+            save(PROGRESS_KEY, n);
             return n;
         });
+        // The finished lord's campaign is over; the faction card moves on to the next lord.
+        if (activeCampaign === key) { save("tww3_activeCampaign", null); setActiveCampaign(null); }
         setVictoryModal(null);
     };
 
     const uncomplete = (key) => {
         setChecked((p) => {
-            const n = { ...p, [key]: { done: false, victory: null } };
-            save("tww3_checked", n);
+            const n = { ...p };
+            delete n[key];
+            save(PROGRESS_KEY, n);
             return n;
         });
     };
@@ -46,7 +45,7 @@ export default function AllFactions({ roadmap, checked, setChecked, activeCampai
     });
     if (sortBy === "tier") entries = [...entries].sort((a, b) => a.tier - b.tier);
     if (sortBy === "difficulty") entries = [...entries].sort((a, b) => a.difficulty - b.difficulty);
-    if (sortBy === "fun") entries = [...entries].sort((a, b) => b.funFactor - a.funFactor);
+
 
     return (
         <div style={{ display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
@@ -75,11 +74,11 @@ export default function AllFactions({ roadmap, checked, setChecked, activeCampai
                     ))}
                 </div>
                 <div style={{ display: "flex", gap: 5 }}>
-                    {[["tier", "Tier"], ["difficulty", "Difficulty"], ["fun", "Fun Factor"]].map(([id, lbl]) => (
+                    {[["faction", "Faction"], ["tier", "Tier"], ["difficulty", "Difficulty"]].map(([id, lbl]) => (
                         <button key={id} onClick={() => setSortBy(id)} style={{ fontSize: 11, padding: "5px 11px", borderRadius: 5, cursor: "pointer", fontFamily: "inherit", background: sortBy === id ? t.bg3 : "transparent", border: `1px solid ${t.border}`, color: sortBy === id ? t.text2 : t.text3 }}>{lbl}</button>
                     ))}
                 </div>
-                <span style={{ fontSize: 11, color: t.text4 }}>{entries.length} Factions</span>
+                <span style={{ fontSize: 11, color: t.text4 }}>{entries.length} {entries.length === 1 ? "Lord" : "Lords"}</span>
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", padding: "14px 34px" }}>
@@ -93,9 +92,9 @@ export default function AllFactions({ roadmap, checked, setChecked, activeCampai
                     const isPlaying = activeCampaign === e.id;
                     return (
                         <div key={e.id} style={{ display: "grid", gridTemplateColumns: "24px 165px 150px 108px 86px 76px 1fr 140px", gap: 10, padding: "10px 10px", alignItems: "center", borderBottom: `1px solid ${t.border}`, background: isPlaying ? `${e.tierColor}08` : "transparent", opacity: done ? 0.58 : 1, borderRadius: 5 }}>
-                            <div onClick={() => { if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: e.faction }); } }} style={{ width: 20, height: 20, borderRadius: 4, cursor: "pointer", border: `1px solid ${done ? "#4ade80" : t.inputBorder}`, background: done ? "rgba(74,222,128,0.15)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#4ade80" }}>{done && "✓"}</div>
+                            <div onClick={() => { if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: `${e.faction} – ${e.lord}` }); } }} style={{ width: 20, height: 20, borderRadius: 4, cursor: "pointer", border: `1px solid ${done ? "#4ade80" : t.inputBorder}`, background: done ? "rgba(74,222,128,0.15)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#4ade80" }}>{done && "✓"}</div>
                             <div style={{ fontSize: 13, color: done ? t.text5 : t.text1, textDecoration: done ? "line-through" : "none" }}>{e.faction}</div>
-                            <div style={{ fontSize: 12, color: e.tierColor }}>{e.lord}</div>
+                            <div style={{ fontSize: 12, color: e.tierColor }}><span style={{ fontSize: 10, color: t.text4, marginRight: 5 }}>{e.queue}.</span>{e.lord}</div>
                             <span style={{ fontSize: 10, padding: "2px 7px", borderRadius: 4, background: `${e.tierColor}18`, color: e.tierColor, border: `1px solid ${e.tierColor}30`, whiteSpace: "nowrap", justifySelf: "start" }}>{e.tierLabel}</span>
                             <DiffDots value={e.difficulty} color={e.tierColor} />
                             <div style={{ fontSize: 12, color: t.text3 }}>{e.length}</div>

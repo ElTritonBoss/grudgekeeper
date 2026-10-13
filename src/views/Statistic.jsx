@@ -1,20 +1,16 @@
 import { useTheme } from "../context/ThemeContext";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from "recharts";
-import { isDone, getVictory, getKills, VICTORY_COLORS } from "../utils/constants";
+import { isDone, getVictory, getKills, VICTORY_COLORS, TIERS } from "../utils/constants";
 
-export default function Statistics({ roadmap, checked, customList }) {
+export default function Statistics({ campaigns, checked, customList }) {
     const t = useTheme();
 
-    const allEntries = roadmap.flatMap(tier =>
-        tier.entries.map((e, i) => ({
-            ...e,
-            tierColor: tier.tierColor,
-            tierLabel: tier.tierLabel,
-            isDone: isDone(checked[`${tier.tier}-${i}`]),
-            victory: getVictory(checked[`${tier.tier}-${i}`]),
-            kills: getKills(checked[`${tier.tier}-${i}`]),
-        }))
-    );
+    const allEntries = campaigns.map(e => ({
+        ...e,
+        isDone: isDone(checked[e.lordId]),
+        victory: getVictory(checked[e.lordId]),
+        kills: getKills(checked[e.lordId]) ?? 0,
+    }));
 
     const doneEntries = allEntries.filter(e => e.isDone);
 
@@ -36,10 +32,10 @@ export default function Statistics({ roadmap, checked, customList }) {
     }, {});
     const topTag = Object.entries(tagCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "—";
 
-    const tierData = roadmap.map(tier => ({
+    const tierData = TIERS.map(tier => ({
         name: tier.tierLabel,
-        done: tier.entries.filter((_, i) => isDone(checked[`${tier.tier}-${i}`])).length,
-        total: tier.entries.length,
+        done: doneEntries.filter(e => e.tier === tier.tier).length,
+        total: allEntries.filter(e => e.tier === tier.tier).length,
         color: tier.tierColor,
     }));
 
@@ -59,8 +55,9 @@ export default function Statistics({ roadmap, checked, customList }) {
     }));
 
     const dlcData = [
-        { name: "Base", done: doneEntries.filter(e => e.dlc.includes("Base")).length, total: allEntries.filter(e => e.dlc.includes("Base")).length },
-        { name: "DLC", done: doneEntries.filter(e => !e.dlc.includes("Base")).length, total: allEntries.filter(e => !e.dlc.includes("Base")).length },
+        { name: "Base", done: doneEntries.filter(e => e.dlc === "Base").length, total: allEntries.filter(e => e.dlc === "Base").length },
+        { name: "Free (FLC)", done: doneEntries.filter(e => e.dlc === "FLC").length, total: allEntries.filter(e => e.dlc === "FLC").length },
+        { name: "DLC", done: doneEntries.filter(e => e.dlc !== "Base" && e.dlc !== "FLC").length, total: allEntries.filter(e => e.dlc !== "Base" && e.dlc !== "FLC").length },
     ];
 
     const victoryData = ["Short", "Long", "Ultimate"].map(v => ({
