@@ -9,10 +9,18 @@ const PORT = 3991;
 const CURRENT_VERSION = app.getVersion();
 const RELEASES_API = "https://api.github.com/repos/ElTritonBoss/grudgekeeper/releases/latest";
 const RELEASES_PAGE = "https://github.com/ElTritonBoss/grudgekeeper/releases/latest";
+// Unit lore built from the player's own game files (scripts/build-unit-lore.mjs
+// copies it here); the Unit Lore page loads it automatically.
+const UNIT_LORE_FILE = path.join(app.getPath("appData"), "Grudgekeeper", "unit-lore.json");
 
 function startServer() {
     return new Promise((resolve) => {
         const server = express();
+        server.get("/local/unit-lore.json", (req, res) => {
+            res.sendFile(UNIT_LORE_FILE, { headers: { "Cache-Control": "no-store" } }, (err) => {
+                if (err && !res.headersSent) res.status(404).end();
+            });
+        });
         server.use(express.static(path.join(__dirname, "dist")));
         http.createServer(server).listen(PORT, () => resolve());
     });
