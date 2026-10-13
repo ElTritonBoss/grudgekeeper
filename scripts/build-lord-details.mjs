@@ -555,6 +555,20 @@ for (const row of readCsv(racesFile)) {
     lords[row.lordId] = lord;
 }
 
+// Every other starting lord in the game too (keyed by agent subtype), for lords the app doesn't list yet.
+const matched = new Set(Object.values(lords).map((l) => l.subtype));
+let extra = 0;
+for (const c of candidates) {
+    if (c.special || !c.faction || matched.has(c.subtype) || !c.words.length) continue;
+    matched.add(c.subtype);
+    lords[c.subtype] = {
+        name: heroName(c.subtype), gameName: heroName(c.subtype), subtype: c.subtype, faction: c.faction,
+        units: lordUnitBuffs(c.subtype, c.faction), heroes: factionHeroes(c.faction), notInApp: true,
+    };
+    extra++;
+}
+if (extra) console.log(`Added ${extra} starting lords the app doesn't list (keyed by agent subtype).`);
+
 fs.writeFileSync(outputFile, JSON.stringify({ format: "grudgekeeper-lord-details", version: 1, generated: new Date().toISOString(), lords }, null, 1));
 
 console.log(`Wrote ${Object.keys(lords).length} lords to ${outputFile}.`);
