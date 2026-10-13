@@ -25,3 +25,6 @@ release
 *.sw?
 # Unit lore built from your own game files (never commit)
 unit-lore.json
+# Local RPFM install and raw game-table exports (never commit)
+tools/
+unit-export/
