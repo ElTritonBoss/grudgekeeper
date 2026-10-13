@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { load, save } from "../hooks/usePersist";
 import { useTheme } from "../context/ThemeContext";
-import { isDone, getVictory, VICTORIES, VICTORY_COLORS } from "../utils/constants";
+import { isDone, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
-import Tag from "../components/Tag";
 import PressureBadge from "../components/PressureBadge";
 
 const DAY = 24 * 60 * 60 * 1000;
+const DETAILS_KEY = "tww3_lordDetails";
+const LOCAL_DETAILS_URL = "/local/lord-details.json";
 
 function sinceText(at) {
     if (!at) return null;
@@ -74,19 +76,82 @@ function SessionLog({ entries, onAdd, onDelete, color }) {
     );
 }
 
+function LordDetails({ lord, details, color }) {
+    const t = useTheme();
+    const panel = { background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" };
+
+    if (!details) {
+        return (
+            <div style={{ ...panel, display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start", justifyContent: "center" }}>
+                <Label color={color}>Skill tree &amp; legendary heroes</Label>
+                <div style={{ fontSize: 13, color: t.text3, lineHeight: 1.65 }}>
+                    Which units {lord}'s skills buff and which legendary heroes you can unlock come from your own copy of the game.
+                    Run <code>scripts\refresh-game-data.ps1</code> once and they'll show up here. The data stays on this PC.
+                </div>
+            </div>
+        );
+    }
+
+    // The file lists units with their buffs; most skills hit several units, so show them per skill.
+    const skills = [];
+    (details.units ?? []).forEach((u) => u.buffs.forEach((b) => {
+        let s = skills.find((x) => x.skill === b.skill && x.effect === b.effect);
+        if (!s) skills.push(s = { skill: b.skill, effect: b.effect, units: [] });
+        if (!s.units.includes(u.unit)) s.units.push(u.unit);
+    }));
+    const heroes = (details.heroes ?? []).filter((h) => !h.unverified);
+    const possible = (details.heroes ?? []).filter((h) => h.unverified);
+    const row = { padding: "8px 0", borderTop: `1px solid ${t.border}` };
+
+    return (
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={panel}>
+                <Label color={color}>⚒ Units {lord}'s skills buff</Label>
+                {skills.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None of this lord's own skills target specific units."}</div>}
+                {skills.map((s) => (
+                    <div key={s.skill + s.effect} style={row}>
+                        <div style={{ fontSize: 13, color }}>{s.skill}</div>
+                        <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.55, marginBottom: 4 }}>{s.effect}</div>
+                        <div style={{ fontSize: 11, color: t.text3, lineHeight: 1.6 }}>{s.units.join(" · ")}</div>
+                    </div>
+                ))}
+            </div>
+            <div style={panel}>
+                <Label color={color}>★ Legendary heroes</Label>
+                {heroes.length === 0 && possible.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None found for this faction."}</div>}
+                {heroes.map((h) => (
+                    <div key={h.name} style={row}>
+                        <div style={{ fontSize: 14, color: t.text1 }}>{h.name} <span style={{ fontSize: 11, color: t.text4 }}>{h.type}</span></div>
+                        {h.unlock && <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.55 }}>{h.unlock}</div>}
+                    </div>
+                ))}
+                {possible.length > 0 && (
+                    <div style={{ ...row, opacity: 0.75 }}>
+                        <div style={{ fontSize: 10, letterSpacing: 2, color: t.text4, textTransform: "uppercase", marginBottom: 4 }} title="The game allows these heroes for this faction, but how they join is handled by campaign scripts the app can't read.">Possible · unlock not confirmed</div>
+                        <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.6 }}>
+                            {possible.map((h) => `${h.name} (${h.type})`).join(" · ")}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
 function Label({ children, color }) {
     const t = useTheme();
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
 
-    const rc = camp.raceColor || camp.tierColor;
-    const cl = camp.tierColor;
     const active = mode === "active";
+    // With faction colours on, the theme already carries a readable accent from the active lord's crest.
+    const rc = (active && t.faction ? t.accent : null) || camp.raceColor || camp.tierColor;
+    const cl = camp.tierColor;
     const lordNo = lords.findIndex((l) => l.lordId === camp.lordId) + 1;
     const style = camp.styles?.[0];
 
@@ -136,24 +201,28 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, onComplete
                     </div>
                 )}
 
-                <div style={{ display: "grid", gridTemplateColumns: active ? "1fr 1fr" : "1fr 1fr 1fr", gap: 14, marginBottom: 18 }}>
-                    {!active && camp.why && (
-                        <div style={{ background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "12px 14px" }}>
-                            <Label>Why play this</Label>
-                            <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.why}</p>
+                <div style={{ display: "grid", gridTemplateColumns: active ? "minmax(0, 1fr) minmax(0, 1fr)" : "1fr", gap: 22, marginBottom: 6 }}>
+                    <div>
+                        <div style={{ display: "grid", gridTemplateColumns: active ? "1fr" : "1fr 1fr 1fr", gap: 12, marginBottom: 18 }}>
+                            {!active && camp.why && (
+                                <div style={{ background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "12px 14px" }}>
+                                    <Label>Why play this</Label>
+                                    <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.why}</p>
+                                </div>
+                            )}
+                            <div style={{ background: `${rc}0c`, border: `1px solid ${rc}30`, borderRadius: 9, padding: "12px 14px" }}>
+                                <Label color={rc}>Key mechanic</Label>
+                                <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.keyMechanic}</p>
+                            </div>
+                            <div style={{ background: t.bg2, borderLeft: `3px solid ${rc}90`, borderRadius: "0 9px 9px 0", padding: "12px 14px" }}>
+                                <Label color={rc}>Campaign tip</Label>
+                                <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.tip}</p>
+                            </div>
                         </div>
-                    )}
-                    <div style={{ background: `${rc}0c`, border: `1px solid ${rc}30`, borderRadius: 9, padding: "12px 14px" }}>
-                        <Label color={rc}>Key mechanic</Label>
-                        <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.keyMechanic}</p>
+                        {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
                     </div>
-                    <div style={{ background: t.bg2, borderLeft: `3px solid ${rc}90`, borderRadius: "0 9px 9px 0", padding: "12px 14px" }}>
-                        <Label color={rc}>Campaign tip</Label>
-                        <p style={{ fontSize: 13, color: t.text2, margin: 0, lineHeight: 1.65 }}>{camp.tip}</p>
-                    </div>
+                    {active && <LordDetails lord={camp.lord} details={details} color={rc} />}
                 </div>
-
-                {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16 }}>
                     {active && !completing && (
@@ -204,10 +273,25 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
     const openCards = roadmap.flatMap((r) => r.entries).filter((e) => !e.complete && !e.needsDlc && e.factionId !== currentCamp?.factionId);
     const currentTier = roadmap.find((r) => r.entries.some((e) => !e.complete && !e.needsDlc));
     const heroCamp = currentCamp ?? openCards[0];
-    const upNext = currentCamp ? openCards.slice(0, 3) : openCards.slice(1, 4);
     const heroLords = heroCamp ? campaigns.filter((e) => e.factionId === heroCamp.factionId) : [];
 
     const start = (id) => setActiveCampaign(id);
+
+    // Skill-tree and hero details come from a file built from your own game install
+    // (scripts/refresh-game-data.ps1), picked up from the app's data folder.
+    const [lordDetails, setLordDetails] = useState(() => load(DETAILS_KEY, null));
+    useEffect(() => {
+        fetch(LOCAL_DETAILS_URL, { cache: "no-store" })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (data?.format !== "grudgekeeper-lord-details" || typeof data.lords !== "object") return;
+                const cached = load(DETAILS_KEY, null);
+                if (cached && cached.generated === data.generated) return;
+                save(DETAILS_KEY, data);
+                setLordDetails(data);
+            })
+            .catch(() => {});
+    }, []);
 
     // Session log entries are kept per lord, newest first.
     const addLog = (text, turn) => {
@@ -263,6 +347,7 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     log={sessionLog[heroCamp.lordId] ?? []}
                     onLogAdd={addLog}
                     onLogDelete={deleteLog}
+                    details={lordDetails?.lords?.[heroCamp.lordId] ?? (lordDetails ? {} : null)}
                     onComplete={complete}
                     onEnd={() => setActiveCampaign(null)}
                     onStart={() => start(heroCamp.id)}
@@ -277,60 +362,6 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                 </div>
             )}
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 20 }}>
-                <div style={{ background: t.bg3, border: `1px solid ${t.border}`, borderRadius: 10, padding: "18px 20px" }}>
-                    <div style={{ fontSize: 10, color: t.text4, letterSpacing: 2, textTransform: "uppercase", marginBottom: 14 }}>Tier Progress</div>
-                    {roadmap.map((r) => {
-                        const lords = allEntries.filter((e) => e.tier === r.tier);
-                        const d = lords.filter((e) => isDone(checked[getKey(e)])).length;
-                        return (
-                            <div key={r.tier} style={{ marginBottom: 11 }}>
-                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 4 }}>
-                                    <span style={{ color: t.text2 }}>{r.tierLabel}</span>
-                                    <span style={{ color: r.tierColor }}>{d}/{lords.length} lords</span>
-                                </div>
-                                <div style={{ background: t.bg2, borderRadius: 3, height: 4, overflow: "hidden" }}>
-                                    <div style={{ height: "100%", width: `${lords.length ? (d / lords.length) * 100 : 0}%`, background: r.tierColor, transition: "width 0.5s", borderRadius: 3 }} />
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-
-                <div style={{ background: t.bg3, border: `1px solid ${t.border}`, borderRadius: 10, padding: "18px 20px" }}>
-                    <div style={{ fontSize: 10, color: "#c060d8", letterSpacing: 2, textTransform: "uppercase", marginBottom: 12 }}>✦ Up next</div>
-                    {upNext.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>Nothing else open on the Roadmap.</div>}
-                    {upNext.map((e) => (
-                        <div key={e.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 0", borderTop: `1px solid ${t.border}` }}>
-                            <FactionIcon src={e.icon} name={e.faction} color={e.raceColor || e.tierColor} size={30} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 14, color: t.text1 }}>{e.faction}</div>
-                                <div style={{ fontSize: 11, color: e.raceColor || e.tierColor }}>{e.lord}</div>
-                            </div>
-                            <DiffDots value={e.difficulty} color={e.tierColor} />
-                            <button onClick={() => start(e.id)} title={currentCamp ? `Switch your active campaign to ${e.lord}` : undefined} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 6, cursor: "pointer", background: "transparent", border: `1px solid ${e.tierColor}50`, color: e.tierColor, fontFamily: "inherit" }}>▷ Start</button>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {done > 0 && (
-                <div style={{ background: t.bg3, border: `1px solid ${t.border}`, borderRadius: 10, padding: "18px 20px" }}>
-                    <div style={{ fontSize: 10, color: t.text4, letterSpacing: 2, textTransform: "uppercase", marginBottom: 14 }}>Hall of Fame – Completed Campaigns</div>
-                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                        {allEntries.filter((e) => isDone(checked[getKey(e)])).map((e) => {
-                            const v = getVictory(checked[getKey(e)]);
-                            return (
-                                <div key={e.id} style={{ background: t.bg2, border: `1px solid ${e.tierColor}30`, borderRadius: 8, padding: "10px 14px", minWidth: 140 }}>
-                                    <div style={{ fontSize: 13, color: t.text1, marginBottom: 1 }}>{e.faction}</div>
-                                    <div style={{ fontSize: 11, color: e.tierColor }}>{e.lord}</div>
-                                    {v && <div style={{ fontSize: 10, color: VICTORY_COLORS[v], marginTop: 3 }}>🏆 {v}</div>}
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

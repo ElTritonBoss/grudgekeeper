@@ -85,7 +85,7 @@ export default function Units({ races }) {
             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
                 <div style={{ maxWidth: 520, textAlign: "center", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
                     <div style={{ fontSize: 36 }}>📜</div>
-                    <div style={{ fontSize: 20, color: t.text1 }}>Unit Lore</div>
+                    <div className="gk-title" style={{ fontSize: 20, color: t.text1 }}>Unit Lore</div>
                     <div style={{ fontSize: 13, color: t.text3, lineHeight: 1.7 }}>
                         The unit descriptions come from your own copy of the game, so they aren't shipped with Grudgekeeper.
                         See <code>docs/unit-lore.md</code> to build <code>unit-lore.json</code> with RPFM. The build
@@ -144,7 +144,7 @@ export default function Units({ races }) {
                 {selected && (
                     <div style={{ maxWidth: 720 }}>
                         <div style={{ fontSize: 9, letterSpacing: 4, color: raceColor(selected.race), textTransform: "uppercase", marginBottom: 5 }}>{selected.race} · {selected.type}</div>
-                        <div style={{ fontSize: 24, color: t.text1, marginBottom: 16 }}>{selected.name}</div>
+                        <div className="gk-title" style={{ fontSize: 24, color: t.text1, marginBottom: 16 }}>{selected.name}</div>
                         {selected.summary && (
                             <div style={{ fontSize: 13, color: t.text3, fontStyle: "italic", lineHeight: 1.7, marginBottom: 18, paddingLeft: 12, borderLeft: `2px solid ${t.border}`, whiteSpace: "pre-line" }}>{selected.summary}</div>
                         )}

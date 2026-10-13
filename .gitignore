@@ -28,3 +28,6 @@ unit-lore.json
 # Local RPFM install and raw game-table exports (never commit)
 tools/
 unit-export/
+# Lord details built from your own game files (never commit)
+lord-details.json
+lord-export/
