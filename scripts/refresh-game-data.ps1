@@ -3,6 +3,7 @@
 # Run from anywhere:  powershell -ExecutionPolicy Bypass -File C:\Users\Nelson\grudgekeeper-src\scripts\refresh-game-data.ps1
 # Game files are only read; nothing is saved back to them. The exports and the
 # two JSON files are game text (CA / GW): they stay on this PC and are gitignored.
+# Both files are written to %APPDATA%\Grudgekeeper, where the app loads them on its own.
 
 param(
     [string]$GameData = 'S:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data',
@@ -114,7 +115,7 @@ if (-not $SkipExport) {
 Push-Location $Repo
 try {
     Write-Host 'Building unit-lore.json...'
-    node scripts/build-unit-lore.mjs unit-export unit-lore.json
+    node scripts/build-unit-lore.mjs unit-export
     Write-Host 'Building lord-details.json...'
-    node scripts/build-lord-details.mjs lord-export lord-details.json
+    node scripts/build-lord-details.mjs lord-export
 } finally { Pop-Location }
