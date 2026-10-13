@@ -23,3 +23,5 @@ release
 *.njsproj
 *.sln
 *.sw?
+# Unit lore built from your own game files (never commit)
+unit-lore.json

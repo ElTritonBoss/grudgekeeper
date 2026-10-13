@@ -15,6 +15,7 @@ import MyList from "./views/MyList";
 import Notes from "./views/Notes";
 import RandomPicker from "./components/RandomPicker";
 import Statistics from "./views/Statistic";
+import Units from "./views/Units";
 
 export default function App() {
 
@@ -50,7 +51,8 @@ export default function App() {
     { id: "browser", icon: "⚔", label: "Faction Browser" },
     { id: "mylist", icon: "🗒", label: "My List", badge: customList.filter((e) => !e.done).length },
     { id: "notes", icon: "✎", label: "Notes", badge: globalNotes.length || null },
-    { id: "statistics", icon: "🗠", label: "Statistics" }
+    { id: "statistics", icon: "🗠", label: "Statistics" },
+    { id: "units", icon: "📜", label: "Unit Lore" }
   ];
 
   if (loadingRoadmap || loadingRaces) {
@@ -167,6 +169,7 @@ export default function App() {
           {view === "mylist" && <MyList customList={customList} setCustomList={setCustomList} />}
           {view === "notes" && <Notes notes={globalNotes} setNotes={setGlobalNotes} />}
           {view === "statistics" && <Statistics roadmap={roadmap} checked={checked} customList={customList} />}
+          {view === "units" && <Units races={races} />}
         </div>
 
       </div>
