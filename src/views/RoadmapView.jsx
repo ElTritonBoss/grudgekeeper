@@ -204,6 +204,15 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                                     const lDone = isDone(p);
                                                     const lVictory = getVictory(p);
                                                     const isCurrent = !done && l.lordId === entry.lordId;
+                                                    // Lords after the current one stay hidden until they're unlocked.
+                                                    if (!lDone && !isCurrent) {
+                                                        return (
+                                                            <div key={l.lordId} onClick={(e) => e.stopPropagation()} title="Complete the current lord to unlock" style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6, border: `1px dashed ${t.border}`, opacity: 0.6 }}>
+                                                                <span style={{ fontSize: 10, color: t.text4, width: 14 }}>{l.queue}</span>
+                                                                <span style={{ flex: 1, fontSize: 12, color: t.text4, fontStyle: "italic" }}>🔒 Locked</span>
+                                                            </div>
+                                                        );
+                                                    }
                                                     return (
                                                         <div key={l.lordId} onClick={(e) => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6, border: `1px solid ${isCurrent ? cl + "60" : t.border}`, background: isCurrent ? `${cl}10` : "transparent", opacity: lDone ? 0.7 : 1 }}>
                                                             <span style={{ fontSize: 10, color: t.text4, width: 14 }}>{l.queue}</span>
