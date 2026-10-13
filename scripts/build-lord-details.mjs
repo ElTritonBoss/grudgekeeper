@@ -39,6 +39,13 @@ const racesFile = racesArg ?? "public/data/races.csv";
 const SKIP = /_(prologue|test|pro\d+)_/;
 const CAMPAIGNS = { main_warhammer: "Immortal Empires", wh3_main_chaos: "Realm of Chaos" };
 
+// TW_WH3_THRONES_OF_DECAY_DWF -> "Thrones of Decay"
+function dlcName(key) {
+    const words = key.replace(/^TW_WH\d?_/, "").replace(/_(DWF|EMP|GRN|VMP|BRT|CHS|BST|WEF|NOR|HEF|DEF|LZD|SKV|TMB|CST|KHO|NUR|SLA|TZE|DAE|KSL|CTH|OGR|CHD|WOC|TOD)$/, "").toLowerCase().split("_");
+    const small = new Set(["of", "the", "and"]);
+    return words.map((w, i) => (i && small.has(w) ? w : w[0].toUpperCase() + w.slice(1))).join(" ");
+}
+
 function walk(dir) {
     return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
         const p = path.join(dir, e.name);
@@ -433,7 +440,7 @@ function scriptedHero(info, faction, culture) {
     }
     if (info.require_dlc) {
         const dlcs = asList(info.require_dlc);
-        if (!dlcs.every((d) => /BASE_GAME/.test(d))) parts.push(`Needs DLC: ${dlcs.join(" or ")}.`);
+        if (!dlcs.every((d) => /BASE_GAME/.test(d))) parts.push(`Needs DLC: ${dlcs.map(dlcName).join(" or ")}.`);
     }
     return { name: names.join(" & "), type: heroType(subtype), unlock: parts.join(" "), subtypes: [subtype, info.additional_subtype].filter(Boolean) };
 }
@@ -471,8 +478,9 @@ function factionHeroes(faction) {
         heroes.push({
             name, type: heroType(p.subtype),
             unlock: files.length
-                ? `Spawned by a campaign script (${files.join(", ")}); the unlock conditions could not be read from the game data.`
-                : "This faction is allowed this unique hero, but no unlock condition was found in the game data.",
+                ? "Joins through a campaign event; the game data doesn't say exactly how."
+                : "This faction is allowed this hero, but no unlock condition was found in the game data.",
+            scripts: files,
             unverified: true,
         });
     }

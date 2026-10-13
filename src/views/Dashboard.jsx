@@ -95,33 +95,47 @@ function LordDetails({ lord, details, color, onLoad, error }) {
         );
     }
 
-    const units = details.units ?? [];
-    const heroes = details.heroes ?? [];
+    // The file lists units with their buffs; most skills hit several units, so show them per skill.
+    const skills = [];
+    (details.units ?? []).forEach((u) => u.buffs.forEach((b) => {
+        let s = skills.find((x) => x.skill === b.skill && x.effect === b.effect);
+        if (!s) skills.push(s = { skill: b.skill, effect: b.effect, units: [] });
+        if (!s.units.includes(u.unit)) s.units.push(u.unit);
+    }));
+    const heroes = (details.heroes ?? []).filter((h) => !h.unverified);
+    const possible = (details.heroes ?? []).filter((h) => h.unverified);
+    const row = { padding: "8px 0", borderTop: `1px solid ${t.border}` };
+
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <div style={panel}>
-                <Label color={color}>⚒ Units {lord} buffs</Label>
-                {units.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>No unit-specific skills found.</div>}
-                {units.map((u) => (
-                    <div key={u.unit} style={{ padding: "8px 0", borderTop: `1px solid ${t.border}` }}>
-                        <div style={{ fontSize: 14, color: t.text1, marginBottom: 3 }}>{u.unit}</div>
-                        {u.buffs.map((b, i) => (
-                            <div key={i} style={{ fontSize: 12, color: t.text3, lineHeight: 1.55 }}>
-                                <span style={{ color }}>{b.skill}</span> · {b.effect}
-                            </div>
-                        ))}
+                <Label color={color}>⚒ Units {lord}'s skills buff</Label>
+                {skills.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None of this lord's own skills target specific units."}</div>}
+                {skills.map((s) => (
+                    <div key={s.skill + s.effect} style={row}>
+                        <div style={{ fontSize: 13, color }}>{s.skill}</div>
+                        <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.55, marginBottom: 4 }}>{s.effect}</div>
+                        <div style={{ fontSize: 11, color: t.text3, lineHeight: 1.6 }}>{s.units.join(" · ")}</div>
                     </div>
                 ))}
             </div>
             <div style={panel}>
                 <Label color={color}>★ Legendary heroes</Label>
-                {heroes.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>None for this faction.</div>}
+                {heroes.length === 0 && possible.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None found for this faction."}</div>}
                 {heroes.map((h) => (
-                    <div key={h.name} style={{ padding: "8px 0", borderTop: `1px solid ${t.border}` }}>
+                    <div key={h.name} style={row}>
                         <div style={{ fontSize: 14, color: t.text1 }}>{h.name} <span style={{ fontSize: 11, color: t.text4 }}>{h.type}</span></div>
                         {h.unlock && <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.55 }}>{h.unlock}</div>}
                     </div>
                 ))}
+                {possible.length > 0 && (
+                    <div style={{ ...row, opacity: 0.75 }}>
+                        <div style={{ fontSize: 10, letterSpacing: 2, color: t.text4, textTransform: "uppercase", marginBottom: 4 }} title="The game allows these heroes for this faction, but how they join is handled by campaign scripts the app can't read.">Possible · unlock not confirmed</div>
+                        <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.6 }}>
+                            {possible.map((h) => `${h.name} (${h.type})`).join(" · ")}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
