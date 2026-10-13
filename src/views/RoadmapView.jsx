@@ -93,7 +93,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: tier.tierBg, border: `1px solid ${tier.tierColor}50`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: "bold", color: tier.tierColor }}>{tier.tier}</div>
                 <div>
                     <div style={{ fontSize: 10, letterSpacing: 4, color: tier.tierColor, textTransform: "uppercase" }}>Tier {tier.tier}</div>
-                    <div style={{ fontSize: 21, color: t.text1, fontWeight: "normal", lineHeight: 1 }}>{tier.tierLabel}</div>
+                    <div className="gk-title" style={{ fontSize: 21, color: t.text1, fontWeight: "normal", lineHeight: 1 }}>{tier.tierLabel}</div>
                 </div>
                 <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
                     {roadmap.map((r) => (

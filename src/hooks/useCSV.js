@@ -59,6 +59,8 @@ export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}) {
             lord: r.lordName,
             dlc: r.lorddlc,
             raceColor: r.color,
+            // Primary and secondary colour of the lord's own faction crest (from the game's flag art).
+            crest: r.crest ? r.crest.split(";").map((c) => c.trim()).filter(Boolean) : [],
             icon: r.icon,
             queue: parseInt(r.queue, 10) || 99,
             difficulty,
