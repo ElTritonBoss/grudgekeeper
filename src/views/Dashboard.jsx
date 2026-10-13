@@ -4,6 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 import { isDone, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
 import PressureBadge from "../components/PressureBadge";
+import CampaignLogTimeline from "../components/CampaignLogTimeline";
 
 const DAY = 24 * 60 * 60 * 1000;
 const DETAILS_KEY = "tww3_lordDetails";
@@ -361,6 +362,8 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     <div style={{ fontSize: 12, color: t.text3, marginTop: 4 }}>The book of grudges is closed. For now.</div>
                 </div>
             )}
+
+            {heroCamp && <CampaignLogTimeline color={(currentCamp && t.faction ? t.accent : null) || heroCamp.raceColor} />}
 
         </div>
     );
