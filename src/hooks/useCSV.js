@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Papa from "papaparse";
 import { isDone, TIERS, tierFor } from "../utils/constants";
+import { lordOwned, lordPack, lordLabel } from "../utils/dlc";
 
 export default function useCSV(path) {
     const [data, setData] = useState([]);
@@ -42,7 +43,8 @@ export function buildStyles(csvRows) {
 
 // One campaign per legendary lord: faction-level text from roadmap.csv,
 // lord-level queue position, difficulty and notes from races.csv.
-export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}) {
+// dlc = { products, requirements, owned } marks lords the player can't play yet.
+export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}, dlc = null) {
     const factions = {};
     roadmapRows.forEach((row) => { factions[row.race] = row; });
 
@@ -58,6 +60,9 @@ export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}) {
             lordId: r.lordId,
             lord: r.lordName,
             dlc: r.lorddlc,
+            owned: dlc ? lordOwned(dlc.requirements, dlc.owned, r.lordId) : true,
+            pack: dlc ? lordPack(dlc.requirements, dlc.products, r.lordId) ?? r.lorddlc : r.lorddlc,
+            dlcLabel: dlc ? lordLabel(dlc.requirements, dlc.products, r.lordId, r.lorddlc) : r.lorddlc,
             raceColor: r.color,
             icon: r.icon,
             queue: parseInt(r.queue, 10) || 99,
@@ -80,26 +85,29 @@ export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}) {
     return campaigns.sort((a, b) => order.indexOf(a.factionId) - order.indexOf(b.factionId) || a.queue - b.queue);
 }
 
-// One card per faction, showing the first lord in its queue that isn't done yet.
-// The card sits in the tier matching that lord's difficulty.
+// One card per faction, showing the first lord in its queue that isn't done yet
+// and whose DLC is owned. The card sits in the tier matching that lord's difficulty.
+// When only unowned lords are left, the card is shown locked (needsDlc).
 export function buildRoadmap(campaigns, progress = {}) {
     const byFaction = {};
     campaigns.forEach((c) => { (byFaction[c.factionId] ??= []).push(c); });
 
     const cards = Object.values(byFaction).map((lords) => {
-        const next = lords.find((l) => !isDone(progress[l.lordId]));
-        const current = next ?? lords[lords.length - 1];
+        const open = lords.filter((l) => !isDone(progress[l.lordId]));
+        const next = open.find((l) => l.owned);
+        const current = next ?? open[0] ?? lords[lords.length - 1];
         return {
             ...current,
             factionLords: lords,
-            doneCount: lords.filter((l) => isDone(progress[l.lordId])).length,
-            complete: !next,
+            doneCount: lords.length - open.length,
+            complete: open.length === 0,
+            needsDlc: open.length > 0 && !next,
         };
     });
 
     return TIERS.map((t) => ({
         ...t,
-        entries: cards.filter((c) => c.tier === t.tier).sort((a, b) => a.complete - b.complete),
+        entries: cards.filter((c) => c.tier === t.tier).sort((a, b) => a.complete - b.complete || a.needsDlc - b.needsDlc),
     }));
 }
 
