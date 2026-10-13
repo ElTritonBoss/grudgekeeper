@@ -66,6 +66,12 @@ function createWindow() {
 
     win.setMenuBarVisibility(false);
 
+    // Open web links (e.g. the wiki) in the normal browser, not a new app window.
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        if (url.startsWith("https://")) shell.openExternal(url);
+        return { action: "deny" };
+    });
+
     if (!isDev) {
         setTimeout(() => checkForUpdates(win), 5000);
     }
