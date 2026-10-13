@@ -6,9 +6,9 @@
 // Usage: node scripts/build-unit-lore.mjs <folder with RPFM TSV exports> [output file]
 //
 // The folder needs (any file names, subfolders are fine):
-//   - main_units_tables        (from data.pack, db/main_units_tables)
-//   - land_units_tables        (from data.pack, db/land_units_tables)
-//   - the English .loc text    (from local_en.pack, the whole text folder)
+//   - main_units_tables        (from db.pack, db/main_units_tables)
+//   - land_units_tables        (from db.pack, db/land_units_tables)
+//   - the English .loc text    (from local_en.pack, each .loc exported as TSV)
 
 import fs from "node:fs";
 import path from "node:path";
@@ -28,7 +28,12 @@ const RACES = {
     skv: "Skaven", tmb: "Tomb Kings", cst: "Vampire Coast", kho: "Khorne",
     nur: "Nurgle", sla: "Slaanesh", tze: "Tzeentch", dae: "Daemons of Chaos",
     ksl: "Kislev", cth: "Grand Cathay", ogr: "Ogre Kingdoms", chd: "Chaos Dwarfs",
+    woc: "Warriors of Chaos", huntmarshall: "Empire", throgg: "Norsca",
+    teb: "Southern Realms", neu: "Neutral", monster: "Wild Monsters",
 };
+
+// Prologue, test and quick-battle-only copies of units.
+const SKIP = /_(prologue|test|pro\d+)_/;
 
 const TYPES = {
     lord: "Lords", hero: "Heroes", melee_infantry: "Melee Infantry",
@@ -103,19 +108,20 @@ if (!mainUnits.length || !landUnits.size || !loc.size) {
 const byRaceAndName = new Map();
 let skipped = 0;
 for (const mu of mainUnits) {
-    if (mu.is_naval === "true") { skipped++; continue; }
+    if (mu.is_naval === "true" || SKIP.test(mu.unit)) { skipped++; continue; }
     const lu = landUnits.get(mu.land_unit);
     const name = cleanText(loc.get(`land_units_onscreen_name_${mu.land_unit}`) ?? "");
     const lore = cleanText(loc.get(`unit_description_historical_texts_text_${lu?.historical_description_text}`) ?? "");
     if (!lu || !name || !lore) { skipped++; continue; }
 
     const code = mu.unit.split("_").find((part) => RACES[part]) ?? mu.unit.split("_")[2] ?? "?";
+    const summary = cleanText(loc.get(`unit_description_short_texts_text_${lu.short_description_text}`) ?? "");
     const unit = {
         key: mu.unit,
         race: RACES[code] ?? `Other (${code})`,
         name,
         type: TYPES[mu.caste] ?? mu.caste,
-        summary: cleanText(loc.get(`unit_description_short_texts_text_${lu.short_description_text}`) ?? ""),
+        summary: summary === lore ? "" : summary,
         lore,
     };
     // The game has many copies of the same unit (summoned, campaign-only, etc.); keep one.
@@ -131,5 +137,5 @@ fs.writeFileSync(outputFile, JSON.stringify({ format: "grudgekeeper-unit-lore", 
 
 const counts = {};
 units.forEach((u) => { counts[u.race] = (counts[u.race] ?? 0) + 1; });
-console.log(`Wrote ${units.length} units to ${outputFile} (${skipped} skipped: naval, no name or no lore).`);
+console.log(`Wrote ${units.length} units to ${outputFile} (${skipped} skipped: naval, prologue/test, no name or no lore).`);
 Object.entries(counts).forEach(([race, n]) => console.log(`  ${race}: ${n}`));

@@ -4,12 +4,11 @@ The **Unit Lore** page shows each unit's in-game description. The text belongs t
 
 ## 1. Export the tables with RPFM
 
-1. Install [RPFM](https://github.com/Frodo45127/rpfm/releases) and set the game to **Warhammer 3** (it will download the schema the first time).
-2. In RPFM's settings, turn on exporting tables as TSV when extracting.
-3. Open `data.pack` from the game's `data` folder. Extract these two folders into one empty folder, e.g. `C:\unit-export`:
-   - `db/main_units_tables`
-   - `db/land_units_tables`
-4. Open `local_en.pack` (same `data` folder) and extract the whole `text` folder into that same folder.
+RPFM v5 no longer has a command-line tool, so this uses the normal app (`rpfm_ui.exe`).
+
+1. Download [RPFM](https://github.com/Frodo45127/rpfm/releases), unzip it anywhere, and set the game to **Warhammer 3**. It downloads the table schemas the first time.
+2. Open `db.pack` from the game's `data` folder (not `data.pack`, which doesn't hold the unit tables). Export `db/main_units_tables` and `db/land_units_tables` as TSV into one empty folder, e.g. `C:\unit-export`.
+3. Open `local_en.pack` from the same `data` folder. Export the `.loc` files in the `text` folder as **TSV** into that same folder. A plain extract gives binary `.loc` files, which the script can't read.
 
 ## 2. Build the lore file
 
