@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ThemeCtx, DARK, LIGHT } from "./context/ThemeContext";
 import usePersist from "./hooks/usePersist";
 import useCSV, {
@@ -27,9 +27,15 @@ export default function App() {
   const [checked, setChecked] = usePersist(PROGRESS_KEY, {});
   const [activeTier, setActiveTier] = usePersist("tww3_activeTier", 1);
   const [activeCampaign, setActiveCampaign] = usePersist("tww3_activeCampaign", null);
+  const [activeSince, setActiveSince] = usePersist("tww3_activeSince", null);
   const [customList, setCustomList] = usePersist("tww3_customList", []);
   const [globalNotes, setGlobalNotes] = usePersist("tww3_notes", []);
   const [showPicker, setShowPicker] = useState(false);
+
+  // Remember when the current active campaign was started, for the Dashboard.
+  useEffect(() => {
+    if (activeCampaign && activeSince?.id !== activeCampaign) setActiveSince({ id: activeCampaign, at: Date.now() });
+  }, [activeCampaign]);
 
   const { data: roadmapCsv, loading: loadingRoadmap } = useCSV("/data/roadmap.csv");
   const { data: stylesCsv, loading: loadingStyles } = useCSV("/data/styles.csv");
@@ -160,7 +166,7 @@ export default function App() {
               onClose={() => setShowPicker(false)}
             />
           )}
-          {view === "dashboard" && <Dashboard roadmap={roadmap} campaigns={campaigns} checked={checked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
+          {view === "dashboard" && <Dashboard roadmap={roadmap} campaigns={campaigns} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} activeSince={activeSince} onRandom={() => setShowPicker(true)} onOpenRoadmap={(tier) => { setActiveTier(tier); setView("roadmap"); }} />}
           {view === "roadmap" && <RoadmapView roadmap={roadmap} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} activeTier={activeTier} setActiveTier={setActiveTier} />}
           {view === "allfactions" && <AllFactions campaigns={campaigns} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
           {view === "browser" && <FactionBrowser races={races} customList={customList} setCustomList={setCustomList} />}
