@@ -9,6 +9,8 @@ import useCSV, {
 } from "./hooks/useCSV";
 import { isDone } from "./utils/constants";
 import { PROGRESS_KEY } from "./utils/progress";
+import { OWNED_KEY, buildProducts, buildRequirements } from "./utils/dlc";
+import { ACHIEVEMENTS_KEY, useAchievementStamps } from "./utils/achievements";
 
 import Dashboard from "./views/Dashboard";
 import RoadmapView from "./views/RoadmapView";
@@ -22,6 +24,9 @@ import Units from "./views/Units";
 import NavIcon, { Emblem } from "./components/NavIcon";
 import factionTheme from "./utils/factionTheme";
 import Motif from "./components/Motif";
+import DlcView from "./views/DlcView";
+import Achievements from "./views/Achievements";
+import Compare from "./views/Compare";
 
 export default function App() {
 
@@ -35,6 +40,9 @@ export default function App() {
   const [customList, setCustomList] = usePersist("tww3_customList", []);
   const [globalNotes, setGlobalNotes] = usePersist("tww3_notes", []);
   const [factionColours, setFactionColours] = usePersist("tww3_factionTheme", true);
+  const [ownedDlc, setOwnedDlc] = usePersist(OWNED_KEY, {});
+  const [achievements, setAchievements] = usePersist(ACHIEVEMENTS_KEY, []);
+  const [compareIds, setCompareIds] = usePersist("tww3_compare", []);
   const [showPicker, setShowPicker] = useState(false);
 
   // Remember when the current active campaign was started, for the Dashboard.
@@ -45,9 +53,12 @@ export default function App() {
   const { data: roadmapCsv, loading: loadingRoadmap } = useCSV("/data/roadmap.csv");
   const { data: stylesCsv, loading: loadingStyles } = useCSV("/data/styles.csv");
   const { data: racesCsv, loading: loadingRaces } = useCSV("/data/races.csv");
+  const { data: dlcCsv, loading: loadingDlc } = useCSV("/data/dlc.csv");
+  const { data: lordDlcCsv, loading: loadingLordDlc } = useCSV("/data/lord-dlc.csv");
 
   const styles = loadingStyles ? [] : buildStyles(stylesCsv);
-  const campaigns = loadingRoadmap || loadingRaces ? [] : buildCampaigns(roadmapCsv, racesCsv, styles);
+  const dlc = { products: buildProducts(dlcCsv), requirements: buildRequirements(lordDlcCsv), owned: ownedDlc };
+  const campaigns = loadingRoadmap || loadingRaces || loadingDlc || loadingLordDlc ? [] : buildCampaigns(roadmapCsv, racesCsv, styles, dlc);
   const roadmap = buildRoadmap(campaigns, checked);
   const races = loadingRaces ? [] : buildRaces(racesCsv);
 
@@ -58,8 +69,12 @@ export default function App() {
   const theme = factionTheme(isDark ? DARK : LIGHT, factionColours ? crest[0] : null, factionColours ? crest[1] : null);
   const crestColor = theme.faction ? theme.accent : (activeFaction?.raceColor || "#5a9a40");
   const motifRace = factionColours && activeFaction ? activeFaction.race : null;
-  const done = campaigns.filter((c) => isDone(checked[c.lordId])).length;
-  const total = campaigns.length;
+  // Lords from DLC you don't own don't count towards the total (unless already done).
+  const playable = campaigns.filter((c) => c.owned || isDone(checked[c.lordId]));
+  const done = playable.filter((c) => isDone(checked[c.lordId])).length;
+  const total = playable.length;
+  const earned = useAchievementStamps(achievements, setAchievements, campaigns, checked);
+  const lockedLords = campaigns.length - playable.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const nav = [
@@ -69,11 +84,14 @@ export default function App() {
     { id: "browser", icon: "⚔", label: "Faction Browser" },
     { id: "mylist", icon: "🗒", label: "My List", badge: customList.filter((e) => !e.done).length },
     { id: "notes", icon: "✎", label: "Notes", badge: globalNotes.length || null },
+    { id: "achievements", icon: "🏅", label: "Achievements", badge: achievements.length ? `${earned}/${achievements.length}` : null },
+    { id: "compare", icon: "⚖", label: "Compare" },
     { id: "statistics", icon: "🗠", label: "Statistics" },
+    { id: "dlc", icon: "🔑", label: "My DLC", badge: lockedLords ? `🔒 ${lockedLords}` : null },
     { id: "units", icon: "📜", label: "Unit Lore" }
   ];
 
-  if (loadingRoadmap || loadingRaces) {
+  if (loadingRoadmap || loadingRaces || loadingDlc || loadingLordDlc) {
     return (
       <div style={{ height: "100vh", width: "100vw", background: theme.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "Palatino, serif", color: theme.text3, fontSize: 16 }}>
         Loading data...
@@ -129,7 +147,7 @@ export default function App() {
                 <button key={item.id} onClick={() => setView(item.id)} className={`gk-nav${on ? " gk-nav-active" : ""}`} style={{ "--gk-hover": theme.text1, width: "100%", background: on ? `linear-gradient(90deg, ${theme.accent}30 0%, ${theme.accent}0d 70%, transparent 100%)` : "transparent", border: "none", borderLeft: on ? `3px solid ${theme.accent}` : "3px solid transparent", boxShadow: on ? `inset 3px 0 12px -6px ${theme.accent}` : "none", cursor: "pointer", padding: "10px 20px 10px 19px", display: "flex", alignItems: "center", gap: 12, textAlign: "left" }}>
                   <span style={{ display: "flex", color: on ? theme.accent : theme.text3 }}><NavIcon id={item.id} fallback={item.icon} /></span>
                   <span style={{ fontSize: 13, letterSpacing: 0.3, color: on ? theme.text1 : theme.text2, flex: 1 }}>{item.label}</span>
-                  {item.badge > 0 && <span style={{ fontSize: 10, minWidth: 20, textAlign: "center", padding: "1px 6px", borderRadius: 10, background: `${theme.accent}22`, color: theme.accent, border: `1px solid ${theme.accent}55` }}>{item.badge}</span>}
+                  {(typeof item.badge === "string" || item.badge > 0) && <span style={{ fontSize: 10, minWidth: 20, textAlign: "center", padding: "1px 6px", borderRadius: 10, background: `${theme.accent}22`, color: theme.accent, border: `1px solid ${theme.accent}55` }}>{item.badge}</span>}
                 </button>
               );
             })}
@@ -196,7 +214,7 @@ export default function App() {
 
           {showPicker && (
             <RandomPicker
-              entries={roadmap.flatMap((r) => r.entries).filter((e) => !e.complete)}
+              entries={roadmap.flatMap((r) => r.entries).filter((e) => !e.complete && !e.needsDlc)}
               onConfirm={(entry) => { setActiveCampaign(entry.id); setShowPicker(false); setView("roadmap"); }}
               onClose={() => setShowPicker(false)}
             />
@@ -211,6 +229,9 @@ export default function App() {
           {view === "notes" && <Notes notes={globalNotes} setNotes={setGlobalNotes} />}
           {view === "statistics" && <Statistics campaigns={campaigns} checked={checked} customList={customList} />}
           {view === "units" && <Units races={races} />}
+          {view === "dlc" && <DlcView products={dlc.products} requirements={dlc.requirements} owned={ownedDlc} setOwned={setOwnedDlc} campaigns={campaigns} checked={checked} />}
+          {view === "achievements" && <Achievements achievements={achievements} setAchievements={setAchievements} campaigns={campaigns} checked={checked} />}
+          {view === "compare" && <Compare roadmap={roadmap} campaigns={campaigns} checked={checked} compareIds={compareIds} setCompareIds={setCompareIds} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
           </div>
         </div>
 

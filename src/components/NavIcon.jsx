@@ -8,6 +8,9 @@ const PATHS = {
     mylist: <><rect x="5" y="4" width="14" height="17" rx="1.5" /><path d="M9 4V2.5h6V4M8.5 10l1.5 1.5L13 8.5M8.5 16h7" /></>,
     notes: <><path d="M15.5 4.5 19.5 8.5 9 19H5v-4L15.5 4.5Z" /><path d="M13 7l4 4" /></>,
     statistics: <><path d="M4 20h16" /><path d="M6.5 20v-6M11 20V9M15.5 20v-8M20 20V5" /></>,
+    achievements: <><circle cx="12" cy="14.5" r="5.5" /><path d="M8.5 3h7l-2 6.5h-3L8.5 3Z" /><path d="m12 12 .9 1.8 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3L12 12Z" /></>,
+    compare: <><path d="M12 4v16M7 20h10M5 7h14" /><path d="M5 7 2.5 13a2.5 2.5 0 0 0 5 0L5 7ZM19 7l-2.5 6a2.5 2.5 0 0 0 5 0L19 7Z" /></>,
+    dlc: <><circle cx="8" cy="8" r="4" /><path d="m11 11 9 9M16 16l2-2M18.5 18.5l2-2" /></>,
     units: <><path d="M7 4h11a2 2 0 0 1 2 2v1h-3" /><path d="M7 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2" /><path d="M8.5 9h6M8.5 12.5h6M8.5 16h4" /></>,
 };
 
