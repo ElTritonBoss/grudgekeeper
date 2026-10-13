@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { save } from "../hooks/usePersist";
+import { PROGRESS_KEY } from "../utils/progress";
 import { isDone, getVictory, getKills, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
 import Tag from "../components/Tag";
@@ -19,17 +20,20 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
     const completeWithVictory = (key, victory) => {
         setChecked((p) => {
             const n = { ...p, [key]: { done: true, victory } };
-            save("tww3_checked", n);
+            save(PROGRESS_KEY, n);
             return n;
         });
+        // The finished lord's campaign is over; the faction card moves on to the next lord.
+        if (activeCampaign === key) { save("tww3_activeCampaign", null); setActiveCampaign(null); }
         setVictoryModal(null);
         setKillsModal({ key, lord: victoryModal.lord });
     };
 
     const uncomplete = (key) => {
         setChecked((p) => {
-            const n = { ...p, [key]: { done: false, victory: null } };
-            save("tww3_checked", n);
+            const n = { ...p };
+            delete n[key];
+            save(PROGRESS_KEY, n);
             return n;
         });
     };
@@ -37,7 +41,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
     const saveKills = (key, kills) => {
         setChecked((p) => {
             const n = { ...p, [key]: { ...p[key], kills } };
-            save("tww3_checked", n);
+            save(PROGRESS_KEY, n);
             return n;
         });
     };
@@ -99,17 +103,23 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
             </div>
 
             <div style={{ flex: 1, overflowY: "auto", padding: "22px 34px", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, alignContent: "start" }}>
-                {tier.entries.map((entry, i) => {
-                    const key = `${tier.tier}-${i}`;
-                    const isOpen = openEntry === key;
-                    const done = isDone(checked[key]);
+                {tier.entries.length === 0 && (
+                    <div style={{ gridColumn: "1 / -1", fontSize: 13, color: t.text4, fontStyle: "italic", padding: "20px 4px" }}>
+                        No factions at this difficulty right now. Factions move here when their next lord is this hard.
+                    </div>
+                )}
+                {tier.entries.map((entry) => {
+                    const key = entry.lordId;
+                    const cardKey = entry.factionId;
+                    const isOpen = openEntry === cardKey;
+                    const done = entry.complete;
                     const victory = getVictory(checked[key]);
                     const isPlaying = activeCampaign === entry.id;
                     const cl = tier.tierColor;
                     const kills = getKills(checked[key]);
 
                     return (
-                        <div key={key} onClick={() => setOpenEntry(isOpen ? null : key)} style={{
+                        <div key={cardKey} onClick={() => setOpenEntry(isOpen ? null : cardKey)} style={{
                             background: isPlaying ? `${cl}0d` : done ? (t.name === "dark" ? "rgba(74,222,128,0.04)" : "rgba(74,222,128,0.09)") : isOpen ? tier.tierBg : t.bg3,
                             border: `1px solid ${done ? "rgba(74,222,128,0.22)" : isOpen ? cl + "55" : t.border}`,
                             borderRadius: 10, cursor: "pointer", transition: "all 0.2s",
@@ -120,14 +130,18 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                             <div style={{ padding: isOpen ? "20px 22px" : "15px 16px", flex: 1 }}>
 
                                 <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 9 }}>
-                                    <div onClick={(e) => { e.stopPropagation(); if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: entry.faction, lord: entry.lord }); } }} style={{ width: 21, height: 21, borderRadius: 4, flexShrink: 0, border: `1px solid ${done ? "#4ade80" : t.inputBorder}`, background: done ? "rgba(74,222,128,0.18)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#4ade80", transition: "all 0.2s", marginTop: 2, cursor: "pointer" }}>{done && "✓"}</div>
+                                    <div onClick={(e) => { e.stopPropagation(); if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: entry.faction, lord: entry.lord }); } }} title={done ? `Undo ${entry.lord}` : `Complete ${entry.lord}`} style={{ width: 21, height: 21, borderRadius: 4, flexShrink: 0, border: `1px solid ${done ? "#4ade80" : t.inputBorder}`, background: done ? "rgba(74,222,128,0.18)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#4ade80", transition: "all 0.2s", marginTop: 2, cursor: "pointer" }}>{done && "✓"}</div>
                                     <div style={{ flex: 1 }}>
                                         <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2, flexWrap: "wrap" }}>
                                             <span style={{ fontSize: isOpen ? 19 : 15, color: done ? t.text5 : t.text1, textDecoration: done ? "line-through" : "none" }}>{entry.faction}</span>
                                             {isPlaying && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: `${cl}25`, color: cl, letterSpacing: 1 }}>ACTIVE</span>}
-                                            {done && victory && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: `${VICTORY_COLORS[victory]}18`, color: VICTORY_COLORS[victory], border: `1px solid ${VICTORY_COLORS[victory]}40`, letterSpacing: 1 }}>🏆 {victory}</span>}
+                                            {done && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.4)", letterSpacing: 1 }}>FACTION COMPLETE</span>}
+                                            {!done && entry.isNew && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: "rgba(232,121,249,0.15)", color: "#e879f9", border: "1px solid rgba(232,121,249,0.4)", letterSpacing: 1 }}>NEW</span>}
                                         </div>
-                                        <div style={{ fontSize: 12, color: cl }}>{entry.lord}</div>
+                                        <div style={{ fontSize: 12, color: cl }}>
+                                            {done ? `All ${entry.factionLords.length} lords done` : entry.lord}
+                                            <span style={{ fontSize: 10, color: t.text4, marginLeft: 6 }}>Lord {Math.min(entry.doneCount + 1, entry.factionLords.length)} of {entry.factionLords.length}</span>
+                                        </div>
                                     </div>
                                     <span style={{ fontSize: 11, color: isOpen ? cl : t.text4, transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "none", paddingTop: 3 }}>▼</span>
                                 </div>
@@ -145,6 +159,11 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
 
                                 {isOpen && (
                                     <div style={{ borderTop: `1px solid ${t.border}`, paddingTop: 16, marginTop: 14 }}>
+                                        {!done && entry.note && (
+                                            <div style={{ fontSize: 13, color: t.body, marginBottom: 14, lineHeight: 1.6 }}>
+                                                <span style={{ fontSize: 9, letterSpacing: 3, color: cl, textTransform: "uppercase", marginRight: 8 }}>{entry.lord}</span>{entry.note}
+                                            </div>
+                                        )}
                                         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 14 }}>
                                             <div>
                                                 <div style={{ fontSize: 9, letterSpacing: 3, color: t.text4, textTransform: "uppercase", marginBottom: 7 }}>Why play this</div>
@@ -177,6 +196,30 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                                 </div>
                                             </div>
                                         </div>
+                                        <div style={{ borderTop: `1px solid ${t.border}`, paddingTop: 12 }}>
+                                            <div style={{ fontSize: 9, letterSpacing: 3, color: t.text4, textTransform: "uppercase", marginBottom: 8 }}>Lord succession</div>
+                                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 6 }}>
+                                                {entry.factionLords.map((l) => {
+                                                    const p = checked[l.lordId];
+                                                    const lDone = isDone(p);
+                                                    const lVictory = getVictory(p);
+                                                    const isCurrent = !done && l.lordId === entry.lordId;
+                                                    return (
+                                                        <div key={l.lordId} onClick={(e) => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6, border: `1px solid ${isCurrent ? cl + "60" : t.border}`, background: isCurrent ? `${cl}10` : "transparent", opacity: lDone ? 0.7 : 1 }}>
+                                                            <span style={{ fontSize: 10, color: t.text4, width: 14 }}>{l.queue}</span>
+                                                            <span
+                                                                onClick={() => { if (lDone) uncomplete(l.lordId); }}
+                                                                title={lDone ? "Click to undo" : undefined}
+                                                                style={{ flex: 1, fontSize: 12, color: lDone ? t.text4 : isCurrent ? cl : t.text2, textDecoration: lDone ? "line-through" : "none", cursor: lDone ? "pointer" : "default" }}
+                                                            >{l.lord}</span>
+                                                            {lDone && lVictory && <span style={{ fontSize: 9, color: VICTORY_COLORS[lVictory] }}>🏆 {lVictory}</span>}
+                                                            {lDone && getKills(p) ? <span style={{ fontSize: 9, color: "#f97316" }}>⚔ {getKills(p)}</span> : null}
+                                                            <DiffDots value={l.difficulty} color={l.tierColor} />
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -187,7 +230,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
 
             <div style={{ flexShrink: 0, borderTop: `1px solid ${t.border}`, background: t.topbar, padding: "11px 34px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <button onClick={() => { setActiveTier((v) => Math.max(1, v - 1)); setOpenEntry(null); }} disabled={activeTier === 1} style={{ background: "transparent", border: `1px solid ${t.border}`, borderRadius: 6, padding: "6px 16px", color: activeTier === 1 ? t.text4 : t.text3, cursor: activeTier === 1 ? "default" : "pointer", fontSize: 12, fontFamily: "inherit" }}>← Previous</button>
-                <span style={{ fontSize: 11, color: t.text4 }}>{tier.entries.filter((_, i) => isDone(checked[`${tier.tier}-${i}`])).length} / {tier.entries.length} in this tier</span>
+                <span style={{ fontSize: 11, color: t.text4 }}>{tier.entries.length} {tier.entries.length === 1 ? "faction" : "factions"} in this tier</span>
                 <button onClick={() => { setActiveTier((v) => Math.min(roadmap.length, v + 1)); setOpenEntry(null); }} disabled={activeTier === roadmap.length} style={{ background: "transparent", border: `1px solid ${t.border}`, borderRadius: 6, padding: "6px 16px", color: activeTier === roadmap.length ? t.text4 : t.text3, cursor: activeTier === roadmap.length ? "default" : "pointer", fontSize: 12, fontFamily: "inherit" }}>Next →</button>
             </div>
         </div>

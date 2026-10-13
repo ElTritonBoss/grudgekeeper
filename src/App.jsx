@@ -2,10 +2,13 @@ import { useState } from "react";
 import { ThemeCtx, DARK, LIGHT } from "./context/ThemeContext";
 import usePersist from "./hooks/usePersist";
 import useCSV, {
+  buildCampaigns,
   buildRoadmap,
   buildRaces,
   buildStyles
 } from "./hooks/useCSV";
+import { isDone } from "./utils/constants";
+import { PROGRESS_KEY } from "./utils/progress";
 
 import Dashboard from "./views/Dashboard";
 import RoadmapView from "./views/RoadmapView";
@@ -21,7 +24,7 @@ export default function App() {
 
   const [isDark, setIsDark] = usePersist("tww3_dark", true);
   const [view, setView] = usePersist("tww3_view", "dashboard");
-  const [checked, setChecked] = usePersist("tww3_checked", {});
+  const [checked, setChecked] = usePersist(PROGRESS_KEY, {});
   const [activeTier, setActiveTier] = usePersist("tww3_activeTier", 1);
   const [activeCampaign, setActiveCampaign] = usePersist("tww3_activeCampaign", null);
   const [customList, setCustomList] = usePersist("tww3_customList", []);
@@ -33,15 +36,15 @@ export default function App() {
   const { data: racesCsv, loading: loadingRaces } = useCSV("/data/races.csv");
 
   const styles = loadingStyles ? [] : buildStyles(stylesCsv);
-  const roadmap = loadingRoadmap ? [] : buildRoadmap(roadmapCsv, styles);
+  const campaigns = loadingRoadmap || loadingRaces ? [] : buildCampaigns(roadmapCsv, racesCsv, styles);
+  const roadmap = buildRoadmap(campaigns, checked);
   const races = loadingRaces ? [] : buildRaces(racesCsv);
 
   const theme = isDark ? DARK : LIGHT;
 
-  const allEntries = roadmap.flatMap((t) => t.entries);
-  const activeFaction = allEntries.find((e) => e.id === activeCampaign);
-  const done = Object.values(checked).filter(v => v?.done ?? !!v).length;
-  const total = allEntries.length;
+  const activeFaction = campaigns.find((e) => e.id === activeCampaign);
+  const done = campaigns.filter((c) => isDone(checked[c.lordId])).length;
+  const total = campaigns.length;
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   const nav = [
@@ -105,14 +108,13 @@ export default function App() {
           {view === "roadmap" && (
             <div style={{ borderTop: `1px solid ${theme.border}`, paddingTop: 8, paddingBottom: 8 }}>
               {roadmap.map((r) => {
-                const d = r.entries.filter((_, i) => { const v = checked[`${r.tier}-${i}`]; return v?.done ?? !!v; }).length;
                 const isAct = activeTier === r.tier;
                 return (
                   <button key={r.tier} onClick={() => setActiveTier(r.tier)} style={{ width: "100%", background: isAct ? r.tierBg : "transparent", border: "none", borderLeft: isAct ? `3px solid ${r.tierColor}` : "3px solid transparent", cursor: "pointer", padding: "8px 20px", display: "flex", gap: 8, alignItems: "center", textAlign: "left" }}>
                     <div style={{ width: 20, height: 20, borderRadius: "50%", background: isAct ? r.tierBg : "transparent", border: `1px solid ${isAct ? r.tierColor + "60" : theme.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: isAct ? r.tierColor : theme.text4, flexShrink: 0 }}>{r.tier}</div>
                     <div>
                       <div style={{ fontSize: 10, letterSpacing: 1, color: isAct ? r.tierColor : theme.text3, textTransform: "uppercase" }}>{r.tierLabel}</div>
-                      <div style={{ fontSize: 9, color: theme.text5 }}>{d}/{r.entries.length}</div>
+                      <div style={{ fontSize: 9, color: theme.text5 }}>{r.entries.length} {r.entries.length === 1 ? "faction" : "factions"}</div>
                     </div>
                   </button>
                 );
@@ -153,22 +155,18 @@ export default function App() {
 
           {showPicker && (
             <RandomPicker
-              entries={allEntries.filter((e) => {
-                const tier = roadmap.find((r) => r.tier === e.tier);
-                const idx = tier?.entries.findIndex((x) => x.id === e.id) ?? -1;
-                return idx !== -1 && !checked[`${e.tier}-${idx}`];
-              })}
+              entries={roadmap.flatMap((r) => r.entries).filter((e) => !e.complete)}
               onConfirm={(entry) => { setActiveCampaign(entry.id); setShowPicker(false); setView("roadmap"); }}
               onClose={() => setShowPicker(false)}
             />
           )}
-          {view === "dashboard" && <Dashboard roadmap={roadmap} checked={checked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
+          {view === "dashboard" && <Dashboard roadmap={roadmap} campaigns={campaigns} checked={checked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
           {view === "roadmap" && <RoadmapView roadmap={roadmap} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} activeTier={activeTier} setActiveTier={setActiveTier} />}
-          {view === "allfactions" && <AllFactions roadmap={roadmap} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
+          {view === "allfactions" && <AllFactions campaigns={campaigns} checked={checked} setChecked={setChecked} activeCampaign={activeCampaign} setActiveCampaign={setActiveCampaign} />}
           {view === "browser" && <FactionBrowser races={races} customList={customList} setCustomList={setCustomList} />}
           {view === "mylist" && <MyList customList={customList} setCustomList={setCustomList} />}
           {view === "notes" && <Notes notes={globalNotes} setNotes={setGlobalNotes} />}
-          {view === "statistics" && <Statistics roadmap={roadmap} checked={checked} customList={customList} />}
+          {view === "statistics" && <Statistics campaigns={campaigns} checked={checked} customList={customList} />}
           {view === "units" && <Units races={races} />}
         </div>
 

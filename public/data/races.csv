@@ -1,111 +1,111 @@
-race,icon,game,color,lordId,lordName,lorddlc
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,thorgrim,Thorgrim Grudgebearer,Base
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,grombrindal,Grombrindal,FLC
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,ungrim,Ungrim Ironfist,Base
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,belegar,Belegar Ironhammer,DLC
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,thorek,Thorek Ironbrow,DLC
-Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,malakai,Malakai Makaisson,Thrones of Decay
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,karlfranz,Karl Franz,Base
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,balthasar,Balthasar Gelt,Base
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,volkmar,Volkmar the Grim,DLC
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,elspeth,Elspeth von Draken,Thrones of Decay
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,grimgor,Grimgor Ironhide,Base
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,azhag,Azhag the Slaughterer,Base
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,skarsnik,Skarsnik,DLC
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,wurrzag,Wurrzag,FLC
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,gorbad,Gorbad Ironclaw,Omens of Destruction
-Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,grom,Grom the Paunch,DLC
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,mannfred,Mannfred von Carstein,Base
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,kemmler,Heinrich Kemmler,Base
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,vlad,Vlad von Carstein,DLC
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,isabella,Isabella von Carstein,DLC
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,helman,Helman Ghorst,DLC
-Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,neferata,Neferata,FLC
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,archaon,Archaon the Everchosen,Chaos Warriors
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,kholek,Kholek Suneater,Chaos Warriors
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,sigvald,Sigvald the Magnificent,Chaos Warriors
-Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,khazrak,Khazrak the One-Eye,Beastmen
-Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,malagor,Malagor the Dark Omen,Beastmen
-Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,morghur,Morghur the Shadowgave,Beastmen
-Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,orion,Orion,Wood Elves
-Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,durthu,Durthu,Wood Elves
-Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,drycha,Drycha,Wood Elves
-Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,sisters,Sisters of Twilight,DLC
-Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,louen,Louen Leoncoeur,FLC
-Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,repanse,Repanse de Lyonesse,DLC
-Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,the_fay,The Fay Enchantress,DLC
-Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,wulfrik,Wulfrik the Wanderer,Norsca
-Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,throgg,Throgg,Norsca
-Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,sayl,Sayl the Faithless,Tides of Torment
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,tyrion,Tyrion,Base
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,teclis,Teclis,Base
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,alarielle,Alarielle the Radiant,DLC
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,imrik,Imrik,DLC
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,eltharion,Eltharion the Grim,DLC
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,aislinn,Sea Lord Aislinn,Tides of Torment
-High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,alith_anar,Alith Anar,DLC
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,malekith,Malekith,Base
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,morathi,Morathi,Base
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,lokhir,Lokhir Fellheart,DLC
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,malus,Malus Darkblade,DLC
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,hellebron,Crone Hellebron,DLC
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,mazdamundi,Lord Mazdamundi,Base
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,kroq,Kroq-Gar,Base
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,gorrok,Gor-Rok,DLC
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,nakai,Nakai the Wanderer,DLC
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,oxyotl,Oxyotl,DLC
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,queek,Queek Headtaker,Base
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,tretch,Tretch Craventail,Base
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,ikitclaw,Ikit Claw,DLC
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,snikch,Deathmaster Snikch,DLC
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,throt,Throt the Unclean,DLC
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,skrolk,Lord Skrolk,Base
-Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,thanquol,Grey Seer Thanquol,Lords of the End Times
-Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,settra,Settra the Imperishable,Tomb Kings
-Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,khalida,Khalida,Tomb Kings
-Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,khatep,Khatep,Tomb Kings
-Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,arkhan,Arkhan the Black,Tomb Kings
-Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,luthor,Luthor Harkon,Vampire Coast
-Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,aranessa,Aranessa Saltspite,Vampire Coast
-Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,noctilus,Count Noctilus,Vampire Coast
-Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,cylostra,Cylostra Direfin,Vampire Coast
-Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,katarin,Katarin the Ice Queen,Base
-Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,kostaltyn,Kostaltyn,Base
-Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,miao_ying,Miao Ying,Base
-Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,zhao_ming,Zhao Ming,Base
-Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,yuan_bo,Yuan Bo,Shadows of Change
-Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,bhashiva,Bhashiva,Bhashiva Character Pack
-Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,skarbrand,Skarbrand,Base
-Tzeentch,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a0/Oracles_of_Tzeentch.png/revision/latest,WH3,#10a090,kairos,Kairos Fateweaver,Base
-Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,kugath,Ku'gath Plaguefather,Base
-Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,epidemius,Epidemius,FLC
-Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,nkari,N'Kari,Base
-Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,dechala,Dechala the Denied One,Tides of Torment
-Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,masque,The Masque,FLC
-Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,greasus,Greasus Goldtooth,Ogre Kingdoms
-Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,skrag,Skrag the Slaughterer,Ogre Kingdoms
-Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,astragoth,Astragoth Ironhand,Forge of CDs
-Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,drazhoath,Drazhoath the Ashen,Forge of CDs
-Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,zhatan,Zhatan the Black,Forge of CDs
-Daemon Prince,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/30/Shadow_Legion.png/revision/latest,WH3,#4a1060,daemonprince,Daemon Prince (Custom),Base
-Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,alberic,Alberic de Bordeleaux,DLC
-Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,taurox,Taurox the Brass Bull,DLC
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,markus,Markus Wulfhart,DLC
-Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,todbringer,Boris Todbringer,Lords of the End Times
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,valkia_woc,Valkia the Bloody,Champions of Chaos
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,festus_woc,Festus the Leechlord,Champions of Chaos
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,azazel_woc,Azazel,Champions of Chaos
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,vilitch_woc,Vilitch the Curseling,Champions of Chaos
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,belakor,Be'lakor,Base
-Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,glottkin,The Glottkin,Lords of the End Times
-Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,rakarth,Rakarth,DLC
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,tiktakto,Tiktaq'to,DLC
-Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,tehenhauin,Tehenhauin,DLC
-Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,boris,Boris Ursus,Base
-Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,ostankya,Mother Ostankya,Shadows of Change
-Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,skulltaker,Skulltaker,Omens of Destruction
-Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,arbaal,Arbaal the Undefeated,FLC
-Tzeentch,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a0/Oracles_of_Tzeentch.png/revision/latest,WH3,#10a090,changeling,The Changeling,Shadows of Change
-Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,tamurkhan,Tamurkhan the Maggot Lord,Thrones of Decay
-Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,golgfag,Golgfag Maneater,Omens of Destruction
-Undead Legions,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f9/Host_of_Nagash.png/revision/latest,WH3 DLC,#3a6a50,nagash,Nagash,Lords of the End Times
+race,icon,game,color,lordId,lordName,lorddlc,queue,difficulty,isNew,note
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,thorgrim,Thorgrim Grudgebearer,Base,1,1,0,Karaz-a-Karak is the safest start in the game. The classic first campaign.
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,grombrindal,Grombrindal,FLC,5,2,0,Powerful lord on top of the relaxed Dwarf economy.
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,ungrim,Ungrim Ironfist,Base,2,3,0,Karak Kadrin sits on the Chaos and Greenskin frontier. Slayer-heavy roster.
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,belegar,Belegar Ironhammer,DLC,3,4,0,"Karak Eight Peaks, boxed in by Skarsnik and Queek with a crippled early economy."
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,thorek,Thorek Ironbrow,DLC,4,3,0,"Slow artefact-forging campaign. Strong late, weak early."
+Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a2/Karaz-a-Karak.png/revision/latest,WH1,#d4a843,malakai,Malakai Makaisson,Thrones of Decay,6,3,0,Mobile adventure campaign with his gunship and constant fighting.
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,karlfranz,Karl Franz,Base,1,2,0,"Reikland is busy (Elector Counts, Vampires, Beastmen) but forgiving."
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,balthasar,Balthasar Gelt,Base,2,3,0,Fragile caster lord close to the Vampire Counts.
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,volkmar,Volkmar the Grim,DLC,3,3,0,Support-style lord on the War Altar. Needs a strong army around him.
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,elspeth,Elspeth von Draken,Thrones of Decay,4,2,0,Nuln and its gunpowder. Widely recommended as an easy Empire start.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,grimgor,Grimgor Ironhide,Base,1,1,0,Brain-off aggression and a duel-monster lord.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,azhag,Azhag the Slaughterer,Base,2,2,0,Straightforward Waaagh! campaign with a decent caster lord.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,skarsnik,Skarsnik,DLC,3,3,0,Fights Belegar and Queek over Eight Peaks from turn one.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,wurrzag,Wurrzag,FLC,6,3,0,Shaman lord with a weaker army. More finesse needed.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,gorbad,Gorbad Ironclaw,Omens of Destruction,4,2,0,Omens of Destruction lord. Guides disagree between easy and moderate.
+Greenskins,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Grimgor%27s_%27Ardboyz.png/revision/latest,WH1,#4a8a20,grom,Grom the Paunch,DLC,5,2,0,Cauldron buffs make his goblins strong.
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,mannfred,Mannfred von Carstein,Base,1,2,0,"Caster and fighter on a forgiving undead economy, now with the 9.0 Necromancy rework."
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,kemmler,Heinrich Kemmler,Base,4,3,0,Barrow Legion between Bretonnia and the Empire. Reworked in 9.0.
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,vlad,Vlad von Carstein,DLC,2,2,0,Commonly named the cleanest first undead campaign.
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,isabella,Isabella von Carstein,DLC,6,2,0,"Same faction and start as Vlad, placed last so you don't replay that start back to back."
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,helman,Helman Ghorst,DLC,5,3,0,"Caravan of Blue Roses on the Spice Route, far from other Vampires."
+Vampire Counts,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/86/Sylvania.png/revision/latest,WH1,#6030a0,neferata,Neferata,FLC,3,3,1,"Silver Pinnacle start among Greenskins, Chaos Dwarfs and Skaven. Intrigue through Covens and the Web of Power."
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,archaon,Archaon the Everchosen,Chaos Warriors,1,3,0,9.0 lets him subjugate defeated Chaos lords and take the Lord of the End Times path.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,kholek,Kholek Suneater,Chaos Warriors,2,3,0,Monster-heavy warband.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,sigvald,Sigvald the Magnificent,Chaos Warriors,3,3,0,Slaanesh-focused since 9.0 and loses the other gods' units.
+Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,khazrak,Khazrak the One-Eye,Beastmen,1,3,0,Horde with no settlements to lean on.
+Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,malagor,Malagor the Dark Omen,Beastmen,2,3,0,Caster horde lord.
+Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,morghur,Morghur the Shadowgave,Beastmen,3,3,0,"Spawn-focused, odd mechanics."
+Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,orion,Orion,Wood Elves,1,3,0,Athel Loren. The Amber economy takes learning.
+Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,durthu,Durthu,Wood Elves,2,3,0,Tree-heavy roster.
+Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,drycha,Drycha,Wood Elves,3,3,0,"Forest spirits, light on city management."
+Wood Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/93/Argwylon.png/revision/latest,WH1 DLC,#2a7a3a,sisters,Sisters of Twilight,DLC,4,3,0,"Missile armies, at war from turn one."
+Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,louen,Louen Leoncoeur,FLC,1,2,0,Cavalry fantasy with a forgiving economy.
+Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,repanse,Repanse de Lyonesse,DLC,4,3,0,Araby coast start with peasant-economy pressure.
+Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,the_fay,The Fay Enchantress,DLC,2,3,0,Caster lord rather than a lance-charger. Several guides rate her start hard.
+Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,wulfrik,Wulfrik the Wanderer,Norsca,1,2,0,Raid-and-move campaign with a simple economy.
+Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,throgg,Throgg,Norsca,2,3,0,Monster-focused with weaker early infantry.
+Norsca,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/32/Wintertooth.png/revision/latest,WH1 DLC,#2a5878,sayl,Sayl the Faithless,Tides of Torment,3,3,1,Chaos Altar rituals and mutation magic.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,tyrion,Tyrion,Base,1,2,0,Ulthuan island start. Regularly called the safest High Elf start.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,teclis,Teclis,Base,2,3,0,Caster lord carrying a fragile army.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,alarielle,Alarielle the Radiant,DLC,3,2,0,Strong empire builder once Ulthuan is secured.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,imrik,Imrik,DLC,5,4,0,"Hostile start among Skaven, Greenskins, Dark Elves and Dwarfs."
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,eltharion,Eltharion the Grim,DLC,4,3,0,Tor Yvresse and its mists.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,aislinn,Sea Lord Aislinn,Tides of Torment,7,4,1,No fixed capital. Pure naval warfare from the Sea Throne.
+High Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/4f/Eataine.png/revision/latest?cb=20171009134155,WH2,#c0a850,alith_anar,Alith Anar,DLC,6,3,0,Stealth play. A popular campaign.
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,malekith,Malekith,Base,1,3,0,"Naggarond, surrounded by enemies in the far north."
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,morathi,Morathi,Base,2,2,0,Dominant early with good diplomacy.
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,lokhir,Lokhir Fellheart,DLC,5,3,0,Black Ark corsair raiding.
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,malus,Malus Darkblade,DLC,4,4,0,Tz'arkan possession mechanic and a rough start.
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,hellebron,Crone Hellebron,DLC,3,3,0,Har Ganeth and the Death Night.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,mazdamundi,Lord Mazdamundi,Base,1,3,0,Poor diplomacy and a crowded start.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,kroq,Kroq-Gar,Base,2,2,0,Monster frontline; Kroq-Gar decides battles himself.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,gorrok,Gor-Rok,DLC,5,1,0,Often named the easiest start in the game.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,nakai,Nakai the Wanderer,DLC,6,3,0,Horde that builds temples for allies. Unusual.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,oxyotl,Oxyotl,DLC,7,2,0,Teleport network. Very strong.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,queek,Queek Headtaker,Base,1,2,0,Strong melee lord and a straightforward Skaven start.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,tretch,Tretch Craventail,Base,7,3,0,Rated hard by several guides.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,ikitclaw,Ikit Claw,DLC,2,3,0,Weapon research and nukes.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,snikch,Deathmaster Snikch,DLC,5,3,0,Assassination campaign.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,throt,Throt the Unclean,DLC,6,3,0,Mutation and monster crafting.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,skrolk,Lord Skrolk,Base,4,3,0,Plague-focused. Reworked in 9.0.
+Skaven,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/4/41/Clan_Mors.png/revision/latest,WH2,#6a5030,thanquol,Grey Seer Thanquol,Lords of the End Times,3,4,1,"Karag Dromar, at war with Zhufbar from turn one. Masterplans can fail by design."
+Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,settra,Settra the Imperishable,Tomb Kings,1,2,0,"Unit caps take learning, but Settra himself carries battles."
+Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,khalida,Khalida,Tomb Kings,3,4,0,One of the harder starts in most lists.
+Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,khatep,Khatep,Tomb Kings,4,3,0,Rated harder than Settra.
+Tomb Kings,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/fd/Khemri.png/revision/latest,WH2 DLC,#c8a030,arkhan,Arkhan the Black,Tomb Kings,2,2,0,Called the safest Tomb Kings start. Gained extra units in 9.0.
+Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,luthor,Luthor Harkon,Vampire Coast,1,3,0,Land-locked start in southern Lustria for a naval faction.
+Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,aranessa,Aranessa Saltspite,Vampire Coast,3,2,0,Rated easy by most guides.
+Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,noctilus,Count Noctilus,Vampire Coast,2,2,0,Beginner-friendly per guides.
+Vampire Coast,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/da/Vampire_Coast.png/revision/latest?cb=20181009142732,WH2 DLC,#207860,cylostra,Cylostra Direfin,Vampire Coast,4,2,0,Rated easy by most guides.
+Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,katarin,Katarin the Ice Queen,Base,1,4,0,Weak economy and melee under Chaos pressure.
+Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,kostaltyn,Kostaltyn,Base,2,5,0,Often called the hardest Legendary Lord in the game.
+Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,miao_ying,Miao Ying,Base,1,3,0,Yin/Yang balance and the Great Bastion. Dragon transformation.
+Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,zhao_ming,Zhao Ming,Base,2,2,0,Often named the easiest Cathay lord.
+Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,yuan_bo,Yuan Bo,Shadows of Change,3,1,0,Rated too easy by several guides.
+Grand Cathay,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/0/0d/The_Northern_Provinces.png/revision/latest?cb=20220219203742,WH3,#c82020,bhashiva,Bhashiva,Bhashiva Character Pack,4,4,1,"Bone Road start next to Greasus, Grimgor, Zhatan and Kholek. Tiger Warriors."
+Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,skarbrand,Skarbrand,Base,1,3,0,Strong but needs careful early play.
+Tzeentch,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a0/Oracles_of_Tzeentch.png/revision/latest,WH3,#10a090,kairos,Kairos Fateweaver,Base,1,4,0,Hostile start and a fragile army. High skill ceiling.
+Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,kugath,Ku'gath Plaguefather,Base,1,3,0,"Slow, plague-driven campaign."
+Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,epidemius,Epidemius,FLC,3,3,0,Rated harder than Tamurkhan.
+Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,nkari,N'Kari,Base,1,4,0,Fast but fragile.
+Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,dechala,Dechala the Denied One,Tides of Torment,2,3,1,"Thrall Camps reward an aggressive, non-linear campaign."
+Slaanesh,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/d/d7/Seducers_of_Slaanesh.png/revision/latest,WH3,#8030a0,masque,The Masque,FLC,3,3,0,Free lord. Little consensus yet.
+Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,greasus,Greasus Goldtooth,Ogre Kingdoms,1,3,0,Weak early armour-piercing and dangerous neighbours.
+Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,skrag,Skrag the Slaughterer,Ogre Kingdoms,2,3,0,Horde-style cauldron lord.
+Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,astragoth,Astragoth Ironhand,Forge of CDs,1,4,0,The deepest economy loop in the game.
+Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,drazhoath,Drazhoath the Ashen,Forge of CDs,2,4,0,Early wars against Skaven and High Elves.
+Chaos Dwarfs,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/9/9c/Disciples_of_Hashut.png/revision/latest,WH3 DLC,#8a1010,zhatan,Zhatan the Black,Forge of CDs,3,4,0,"Same economy, exposed position."
+Daemon Prince,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/3/30/Shadow_Legion.png/revision/latest,WH3,#4a1060,daemonprince,Daemon Prince (Custom),Base,1,4,0,Build-your-own lord. Only one campaign.
+Bretonnia,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c1/Bretonnia.png/revision/latest?cb=20210805002056,WH1 FLC,#1a5090,alberic,Alberic de Bordeleaux,DLC,3,2,0,Straightforward Bretonnian campaign.
+Beastmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/c/c9/Warherd_of_the_Shadowgave.png/revision/latest,WH1 DLC,#5a6820,taurox,Taurox the Brass Bull,DLC,4,2,0,Momentum-driven and very fast. Most guides rate him easy.
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,markus,Markus Wulfhart,DLC,6,4,0,"Starts in Lustria surrounded by Lizardmen, far from Empire support."
+Empire,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/e/e9/Reikland.png/revision/latest?cb=20200314213259,WH1,#c8a020,todbringer,Boris Todbringer,Lords of the End Times,5,2,1,Middenheim. Fervour funds the Great Temple of Ulric; rivalry with Khazrak.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,valkia_woc,Valkia the Bloody,Champions of Chaos,5,3,0,Khorne-marked champion. Guides vary.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,festus_woc,Festus the Leechlord,Champions of Chaos,6,2,0,Rated easy by most guides.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,azazel_woc,Azazel,Champions of Chaos,8,3,0,"Slaanesh-marked champion, harder than the other Champions in most lists."
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,vilitch_woc,Vilitch the Curseling,Champions of Chaos,7,3,0,Tzeentch-marked champion. Guides vary.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,belakor,Be'lakor,Base,4,2,0,Several guides rate him easy.
+Warriors of Chaos,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f6/Warhost_of_the_Apocalypse.png/revision/latest,WH1 DLC,#8a1818,glottkin,The Glottkin,Lords of the End Times,9,3,1,"Norsca start. Slow corruption ramp, very hard to kill."
+Dark Elves,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/5/5a/Naggarond.png/revision/latest,WH2,#5020a0,rakarth,Rakarth,DLC,6,2,0,Island start with beast-taming.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,tiktakto,Tiktaq'to,DLC,4,3,0,Air-unit focus.
+Lizardmen,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/2/2c/Itza.png/revision/latest,WH2,#20a080,tehenhauin,Tehenhauin,DLC,3,2,0,Skink sacrifice mechanic. Guides call it easy.
+Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,boris,Boris Ursus,Base,3,5,0,Several lists place him at the hardest end.
+Kislev,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/ab/The_Ice_Court.png/revision/latest?cb=20220219203731,WH3,#4080c0,ostankya,Mother Ostankya,Shadows of Change,4,3,0,"Hex-based campaign, more forgiving than the other Kislev lords."
+Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,skulltaker,Skulltaker,Omens of Destruction,2,3,0,Omens lord. Little consensus yet.
+Khorne,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f2/Exiles_of_Khorne.png/revision/latest,WH3,#c01010,arbaal,Arbaal the Undefeated,FLC,3,3,0,Free 6.0 lord. Little consensus yet.
+Tzeentch,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/a/a0/Oracles_of_Tzeentch.png/revision/latest,WH3,#10a090,changeling,The Changeling,Shadows of Change,2,2,0,Hidden armies and teleports. Very strong once understood.
+Nurgle,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/8/8d/Poxmakers_of_Nurgle.png/revision/latest,WH3,#5a7820,tamurkhan,Tamurkhan the Maggot Lord,Thrones of Decay,2,2,0,Rated easy by most guides.
+Ogre Kingdoms,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/1/14/Goldtooth.png/revision/latest?cb=20220219205014,WH3 DLC,#8a6030,golgfag,Golgfag Maneater,Omens of Destruction,3,3,0,Mercenary campaign (Omens of Destruction).
+Undead Legions,https://static.wikia.nocookie.net/totalwarhammer_gamepedia/images/f/f9/Host_of_Nagash.png/revision/latest,WH3 DLC,#3a6a50,nagash,Nagash,Lords of the End Times,1,4,1,Southlands start. One of the longest campaigns in the game. Immortal Empires only.
