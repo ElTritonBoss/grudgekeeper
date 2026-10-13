@@ -2,6 +2,16 @@
 
 The **Unit Lore** page shows each unit's in-game description. The text belongs to Creative Assembly / Games Workshop, so it is not shipped with Grudgekeeper. You build it from your own copy of the game, and it stays on your PC.
 
+## Quick refresh (after a game update)
+
+Once RPFM is in `tools\rpfm` (step 1 below), one command does steps 1 and 2 for you. Run it in PowerShell from the Grudgekeeper source folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\refresh-unit-lore.ps1
+```
+
+It finds the game through Steam, exports the unit tables and English text into `unit-export`, and rebuilds `unit-lore.json`. If the game isn't found, add `-GameData 'X:\...\Total War WARHAMMER III\data'`. Then load the file in the app (step 3).
+
 ## 1. Export the tables with RPFM
 
 RPFM v5 no longer has a command-line tool, so this uses the normal app (`rpfm_ui.exe`).
