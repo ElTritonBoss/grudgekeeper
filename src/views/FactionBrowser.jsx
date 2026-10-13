@@ -29,7 +29,7 @@ export default function FactionBrowser({ races, customList, setCustomList }) {
                 <div style={{ padding: "14px 26px", borderBottom: `1px solid ${t.border}`, flexShrink: 0, display: "flex", gap: 14, alignItems: "center" }}>
                     <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 9, letterSpacing: 5, color: t.text4, textTransform: "uppercase", marginBottom: 3 }}>Faction Browser</div>
-                        <div style={{ fontSize: 20, color: t.text1, fontWeight: "normal" }}>All Legendary Lords</div>
+                        <div className="gk-title" style={{ fontSize: 20, color: t.text1, fontWeight: "normal" }}>All Legendary Lords</div>
                     </div>
                     <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search lord or race..." style={{ background: t.input, border: `1px solid ${t.border}`, borderRadius: 8, padding: "8px 14px", fontSize: 13, color: t.text2, width: 230, outline: "none", fontFamily: "inherit" }} />
                 </div>

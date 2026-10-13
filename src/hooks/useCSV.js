@@ -64,6 +64,8 @@ export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}, dlc = null
             pack: dlc ? lordPack(dlc.requirements, dlc.products, r.lordId) ?? r.lorddlc : r.lorddlc,
             dlcLabel: dlc ? lordLabel(dlc.requirements, dlc.products, r.lordId, r.lorddlc) : r.lorddlc,
             raceColor: r.color,
+            // Primary and secondary colour of the lord's own faction crest (from the game's flag art).
+            crest: r.crest ? r.crest.split(";").map((c) => c.trim()).filter(Boolean) : [],
             icon: r.icon,
             queue: parseInt(r.queue, 10) || 99,
             difficulty,
