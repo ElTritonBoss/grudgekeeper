@@ -33,6 +33,7 @@
     "files": [
       "dist/**/*",
       "electron-main.js",
+      "campaign-logs.cjs",
       "node_modules/express/**/*",
       "node_modules/serve-static/**/*",
       "node_modules/finalhandler/**/*",
