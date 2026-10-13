@@ -28,12 +28,58 @@ function FactionIcon({ src, name, color, size }) {
     );
 }
 
+function SessionLog({ entries, onAdd, onDelete, color }) {
+    const t = useTheme();
+    const [text, setText] = useState("");
+    const [turn, setTurn] = useState("");
+
+    const add = () => {
+        if (!text.trim()) return;
+        onAdd(text.trim(), turn ? Number(turn) : null);
+        setText("");
+    };
+
+    const field = { fontSize: 13, padding: "8px 10px", borderRadius: 7, background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text1, fontFamily: "inherit", outline: "none" };
+
+    return (
+        <div style={{ marginBottom: 18 }}>
+            <Label>📜 Session log{entries.length ? ` · ${entries.length} ${entries.length === 1 ? "entry" : "entries"}` : ""}</Label>
+            <div style={{ display: "flex", gap: 8, marginBottom: entries.length ? 10 : 0, alignItems: "flex-start" }}>
+                <input type="number" min="1" value={turn} placeholder="Turn" title="Turn number (optional)" onChange={(e) => setTurn(e.target.value)} style={{ ...field, width: 64, color }} />
+                <textarea
+                    value={text}
+                    rows={1}
+                    placeholder="What happened? Enter to add, Shift+Enter for a new line"
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); add(); } }}
+                    style={{ ...field, flex: 1, resize: "vertical", minHeight: 20, lineHeight: 1.5 }}
+                />
+                <button onClick={add} style={{ fontSize: 12, padding: "8px 16px", borderRadius: 7, cursor: "pointer", fontFamily: "inherit", background: `${color}22`, border: `1px solid ${color}70`, color }}>Add</button>
+            </div>
+            {entries.length > 0 && (
+                <div style={{ maxHeight: 210, overflowY: "auto", borderLeft: `2px solid ${color}40`, paddingLeft: 14 }}>
+                    {entries.map((e) => (
+                        <div key={e.id} style={{ display: "flex", gap: 12, padding: "6px 0", alignItems: "baseline" }}>
+                            <div style={{ width: 84, flexShrink: 0, fontSize: 10, color: t.text4, lineHeight: 1.5 }}>
+                                {e.turn != null && <div style={{ color, fontSize: 11 }}>Turn {e.turn}</div>}
+                                {new Date(e.at).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}
+                            </div>
+                            <div style={{ flex: 1, fontSize: 13, color: t.text2, lineHeight: 1.55, whiteSpace: "pre-wrap" }}>{e.text}</div>
+                            <button onClick={() => { if (window.confirm("Delete this log entry?")) onDelete(e.id); }} title="Delete entry" style={{ background: "transparent", border: "none", color: t.text4, cursor: "pointer", fontSize: 12, opacity: 0.6 }}>✕</button>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+}
+
 function Label({ children, color }) {
     const t = useTheme();
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, checked, mode, since, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
@@ -41,7 +87,6 @@ function Hero({ camp, lords, checked, mode, since, onComplete, onEnd, onStart, o
     const rc = camp.raceColor || camp.tierColor;
     const cl = camp.tierColor;
     const active = mode === "active";
-    const doneLords = lords.filter((l) => isDone(checked[l.lordId])).length;
     const lordNo = lords.findIndex((l) => l.lordId === camp.lordId) + 1;
     const style = camp.styles?.[0];
 
@@ -108,24 +153,7 @@ function Hero({ camp, lords, checked, mode, since, onComplete, onEnd, onStart, o
                     </div>
                 </div>
 
-                {lords.length > 1 && (
-                    <div style={{ marginBottom: 18 }}>
-                        <Label>{camp.faction} lords · {doneLords} of {lords.length} done</Label>
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                            {lords.map((l) => {
-                                const lDone = isDone(checked[l.lordId]);
-                                const v = getVictory(checked[l.lordId]);
-                                const isCur = l.lordId === camp.lordId;
-                                return (
-                                    <div key={l.lordId} title={l.note} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, padding: "4px 10px", borderRadius: 20, border: `1px solid ${isCur ? rc + "90" : lDone ? "rgba(74,222,128,0.35)" : t.border}`, background: isCur ? `${rc}20` : lDone ? "rgba(74,222,128,0.07)" : "transparent", color: isCur ? rc : lDone ? t.text4 : t.text3 }}>
-                                        {lDone ? <span style={{ color: v ? VICTORY_COLORS[v] : "#4ade80" }}>🏆</span> : isCur ? <span>▶</span> : <span style={{ opacity: 0.5 }}>○</span>}
-                                        <span style={{ textDecoration: lDone ? "line-through" : "none" }}>{l.lord}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                )}
+                {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16 }}>
                     {active && !completing && (
@@ -159,7 +187,7 @@ function Hero({ camp, lords, checked, mode, since, onComplete, onEnd, onStart, o
     );
 }
 
-export default function Dashboard({ roadmap, campaigns, checked, setChecked, activeCampaign, setActiveCampaign, activeSince, onRandom, onOpenRoadmap }) {
+export default function Dashboard({ roadmap, campaigns, checked, setChecked, activeCampaign, setActiveCampaign, activeSince, sessionLog, setSessionLog, onRandom, onOpenRoadmap }) {
     const t = useTheme();
 
     const allEntries = campaigns;
@@ -179,6 +207,17 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
     const heroLords = heroCamp ? allEntries.filter((e) => e.factionId === heroCamp.factionId) : [];
 
     const start = (id) => setActiveCampaign(id);
+
+    // Session log entries are kept per lord, newest first.
+    const addLog = (text, turn) => {
+        const key = currentCamp.lordId;
+        const entry = { id: `log_${Date.now()}`, at: Date.now(), turn, text };
+        setSessionLog((p) => ({ ...p, [key]: [entry, ...(p[key] ?? [])] }));
+    };
+    const deleteLog = (id) => {
+        const key = currentCamp.lordId;
+        setSessionLog((p) => ({ ...p, [key]: (p[key] ?? []).filter((e) => e.id !== id) }));
+    };
 
     const complete = (victory, kills) => {
         const key = currentCamp.lordId;
@@ -218,9 +257,11 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     key={heroCamp.id}
                     camp={heroCamp}
                     lords={heroLords}
-                    checked={checked}
                     mode={currentCamp ? "active" : "suggest"}
                     since={sinceText(activeSince?.id === activeCampaign ? activeSince.at : null)}
+                    log={sessionLog[heroCamp.lordId] ?? []}
+                    onLogAdd={addLog}
+                    onLogDelete={deleteLog}
                     onComplete={complete}
                     onEnd={() => setActiveCampaign(null)}
                     onStart={() => start(heroCamp.id)}
