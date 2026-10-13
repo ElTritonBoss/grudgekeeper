@@ -7,11 +7,11 @@ const https = require("https");
 const isDev = process.env.NODE_ENV === "development";
 const PORT = 3991;
 const CURRENT_VERSION = app.getVersion();
-const RELEASES_API = "https://api.github.com/repos/ZintelFelix/grudgekeeper/releases/latest";
+const RELEASES_API = "https://api.github.com/repos/ElTritonBoss/grudgekeeper/releases/latest";
+const RELEASES_PAGE = "https://github.com/ElTritonBoss/grudgekeeper/releases/latest";
 // Unit lore built from the player's own game files (scripts/build-unit-lore.mjs
 // copies it here); the Unit Lore page loads it automatically.
 const UNIT_LORE_FILE = path.join(app.getPath("appData"), "Grudgekeeper", "unit-lore.json");
-const RELEASES_PAGE = "https://github.com/ZintelFelix/grudgekeeper/releases/latest";
 
 function startServer() {
     return new Promise((resolve) => {
@@ -26,6 +26,17 @@ function startServer() {
     });
 }
 
+// True only when `latest` is a higher version than `current` (e.g. 1.2.0 > 1.1.0).
+function isNewer(latest, current) {
+    const a = latest.split(".").map(Number);
+    const b = current.split(".").map(Number);
+    for (let i = 0; i < Math.max(a.length, b.length); i++) {
+        const x = a[i] || 0, y = b[i] || 0;
+        if (x !== y) return x > y;
+    }
+    return false;
+}
+
 function checkForUpdates(win) {
     https.get(RELEASES_API, { headers: { "User-Agent": "grudgekeeper-app" } }, (res) => {
         let data = "";
@@ -34,7 +45,7 @@ function checkForUpdates(win) {
             try {
                 const release = JSON.parse(data);
                 const latest = release.tag_name?.replace("v", "");
-                if (latest && latest !== CURRENT_VERSION) {
+                if (latest && isNewer(latest, CURRENT_VERSION)) {
                     dialog.showMessageBox(win, {
                         type: "info",
                         title: "Update available",
