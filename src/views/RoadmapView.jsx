@@ -93,7 +93,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: tier.tierBg, border: `1px solid ${tier.tierColor}50`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: "bold", color: tier.tierColor }}>{tier.tier}</div>
                 <div>
                     <div style={{ fontSize: 10, letterSpacing: 4, color: tier.tierColor, textTransform: "uppercase" }}>Tier {tier.tier}</div>
-                    <div style={{ fontSize: 21, color: t.text1, fontWeight: "normal", lineHeight: 1 }}>{tier.tierLabel}</div>
+                    <div className="gk-title" style={{ fontSize: 21, color: t.text1, fontWeight: "normal", lineHeight: 1 }}>{tier.tierLabel}</div>
                 </div>
                 <div style={{ marginLeft: "auto", display: "flex", gap: 8, alignItems: "center" }}>
                     {roadmap.map((r) => (
@@ -123,7 +123,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                             background: isPlaying ? `${cl}0d` : done ? (t.name === "dark" ? "rgba(74,222,128,0.04)" : "rgba(74,222,128,0.09)") : isOpen ? tier.tierBg : t.bg3,
                             border: `1px solid ${done ? "rgba(74,222,128,0.22)" : isOpen ? cl + "55" : t.border}`,
                             borderRadius: 10, cursor: "pointer", transition: "all 0.2s",
-                            opacity: done ? 0.65 : 1, display: "flex", flexDirection: "column", overflow: "hidden",
+                            opacity: done ? 0.65 : entry.needsDlc ? 0.5 : 1, display: "flex", flexDirection: "column", overflow: "hidden",
                             ...(isOpen ? { gridColumn: "1 / -1" } : {}),
                         }}>
                             <div style={{ height: 2, background: isOpen || isPlaying ? `${cl}70` : `${cl}30`, flexShrink: 0 }} />
@@ -136,6 +136,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                             <span style={{ fontSize: isOpen ? 19 : 15, color: done ? t.text5 : t.text1, textDecoration: done ? "line-through" : "none" }}>{entry.faction}</span>
                                             {isPlaying && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: `${cl}25`, color: cl, letterSpacing: 1 }}>ACTIVE</span>}
                                             {done && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: "rgba(74,222,128,0.15)", color: "#4ade80", border: "1px solid rgba(74,222,128,0.4)", letterSpacing: 1 }}>FACTION COMPLETE</span>}
+                                            {entry.needsDlc && <span title={`You've marked ${entry.pack} as not owned`} style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: "rgba(239,68,68,0.12)", color: "#ef4444", border: "1px solid rgba(239,68,68,0.4)", letterSpacing: 1 }}>🔒 NEEDS DLC</span>}
                                             {!done && entry.isNew && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: "rgba(232,121,249,0.15)", color: "#e879f9", border: "1px solid rgba(232,121,249,0.4)", letterSpacing: 1 }}>NEW</span>}
                                         </div>
                                         <div style={{ fontSize: 12, color: cl }}>
@@ -154,7 +155,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                 </div>
                                 <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                                     {entry.tags.map((tag) => <Tag key={tag} label={tag} color={cl} />)}
-                                    <span style={{ fontSize: 10, color: t.text4, padding: "2px 4px" }}>{entry.dlc}</span>
+                                    <span style={{ fontSize: 10, color: entry.needsDlc ? "#ef4444" : t.text4, padding: "2px 4px" }}>{entry.needsDlc ? `🔒 ${entry.pack}` : entry.dlcLabel}</span>
                                 </div>
 
                                 {isOpen && (
@@ -183,7 +184,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                                     <p style={{ fontSize: 13, color: t.body, margin: 0, lineHeight: 1.6 }}>{entry.tip}</p>
                                                 </div>
                                                 <div style={{ display: "flex", gap: 7 }}>
-                                                    <button onClick={(e) => { e.stopPropagation(); const n = activeCampaign === entry.id ? null : entry.id; save("tww3_activeCampaign", n); setActiveCampaign(n); }} style={{ flex: 1, fontSize: 11, padding: "6px 0", borderRadius: 6, cursor: "pointer", background: activeCampaign === entry.id ? `${cl}25` : "transparent", border: `1px solid ${cl}50`, color: cl, fontFamily: "inherit" }}>{activeCampaign === entry.id ? "▶ Active" : "▷ Start"}</button>
+                                                    <button disabled={entry.needsDlc} title={entry.needsDlc ? `Needs ${entry.pack}` : undefined} onClick={(e) => { e.stopPropagation(); if (entry.needsDlc) return; const n = activeCampaign === entry.id ? null : entry.id; save("tww3_activeCampaign", n); setActiveCampaign(n); }} style={{ opacity: entry.needsDlc ? 0.4 : 1, flex: 1, fontSize: 11, padding: "6px 0", borderRadius: 6, cursor: "pointer", background: activeCampaign === entry.id ? `${cl}25` : "transparent", border: `1px solid ${cl}50`, color: cl, fontFamily: "inherit" }}>{entry.needsDlc ? "🔒 Needs DLC" : activeCampaign === entry.id ? "▶ Active" : "▷ Start"}</button>
                                                     <button onClick={(e) => { e.stopPropagation(); if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: entry.faction, lord: entry.lord }); } }} style={{ flex: 1, fontSize: 11, padding: "6px 0", borderRadius: 6, cursor: "pointer", background: done ? "rgba(74,222,128,0.15)" : "transparent", border: `1px solid ${done ? "#4ade80" : t.border}`, color: done ? "#4ade80" : t.text3, fontFamily: "inherit" }}>{done ? `✓ ${victory ?? "Done"}` : "Complete"}</button>
                                                     <div>
                                                         {done && (
@@ -209,7 +210,7 @@ export default function RoadmapView({ roadmap, checked, setChecked, activeCampai
                                                         return (
                                                             <div key={l.lordId} onClick={(e) => e.stopPropagation()} title="Complete the current lord to unlock" style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 8px", borderRadius: 6, border: `1px dashed ${t.border}`, opacity: 0.6 }}>
                                                                 <span style={{ fontSize: 10, color: t.text4, width: 14 }}>{l.queue}</span>
-                                                                <span style={{ flex: 1, fontSize: 12, color: t.text4, fontStyle: "italic" }}>🔒 Locked</span>
+                                                                <span style={{ flex: 1, fontSize: 12, color: t.text4, fontStyle: "italic" }}>🔒 Locked{!l.owned && <span style={{ color: "#ef4444", fontStyle: "normal" }}> · needs DLC</span>}</span>
                                                             </div>
                                                         );
                                                     }

@@ -1,10 +1,24 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useTheme } from "../context/ThemeContext";
 import { load, save } from "../hooks/usePersist";
 
 // The lore text comes from a file built from your own game install
-// (scripts/build-unit-lore.mjs) and is kept only on this PC.
+// (scripts/build-unit-lore.mjs) and is kept only on this PC. The script copies
+// it to the app's data folder, which the app serves at LOCAL_LORE_URL.
 const STORAGE_KEY = "tww3_unitLore";
+const LOCAL_LORE_URL = "/local/unit-lore.json";
+const LOCAL_LORE_PATH = "%APPDATA%\\Grudgekeeper\\unit-lore.json";
+
+const isLoreFile = (data) => data?.format === "grudgekeeper-unit-lore" && Array.isArray(data.units);
+
+function storeLore(data) {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 export default function Units({ races }) {
     const t = useTheme();
@@ -15,6 +29,18 @@ export default function Units({ races }) {
     const [type, setType] = useState("All");
     const [search, setSearch] = useState("");
     const [selectedKey, setSelectedKey] = useState(null);
+
+    // Pick up a new or rebuilt lore file from the app's data folder on open.
+    useEffect(() => {
+        fetch(LOCAL_LORE_URL, { cache: "no-store" })
+            .then((res) => (res.ok ? res.json() : null))
+            .then((data) => {
+                if (!isLoreFile(data) || load(STORAGE_KEY, null)?.generated === data.generated) return;
+                storeLore(data);
+                setLore(data);
+            })
+            .catch(() => {});
+    }, []);
 
     const units = lore?.units ?? [];
     const raceColor = (name) => races.find((r) => r.race === name)?.color ?? t.accent;
@@ -35,14 +61,10 @@ export default function Units({ races }) {
         if (!file) return;
         file.text().then((text) => {
             const data = JSON.parse(text);
-            if (data.format !== "grudgekeeper-unit-lore" || !Array.isArray(data.units)) {
+            if (!isLoreFile(data)) {
                 throw new Error("This isn't a unit lore file. Build one with scripts/build-unit-lore.mjs.");
             }
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            } catch {
-                throw new Error("The file is too big to store in the app.");
-            }
+            if (!storeLore(data)) throw new Error("The file is too big to store in the app.");
             setLore(data);
             setError(null);
             setRace(null);
@@ -63,11 +85,12 @@ export default function Units({ races }) {
             <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", padding: 40 }}>
                 <div style={{ maxWidth: 520, textAlign: "center", display: "flex", flexDirection: "column", gap: 14, alignItems: "center" }}>
                     <div style={{ fontSize: 36 }}>📜</div>
-                    <div style={{ fontSize: 20, color: t.text1 }}>Unit Lore</div>
+                    <div className="gk-title" style={{ fontSize: 20, color: t.text1 }}>Unit Lore</div>
                     <div style={{ fontSize: 13, color: t.text3, lineHeight: 1.7 }}>
                         The unit descriptions come from your own copy of the game, so they aren't shipped with Grudgekeeper.
-                        See <code>docs/unit-lore.md</code> to build <code>unit-lore.json</code> with RPFM, then load the
-                        file here. It stays on this PC.
+                        See <code>docs/unit-lore.md</code> to build <code>unit-lore.json</code> with RPFM. The build
+                        script puts it in <code>{LOCAL_LORE_PATH}</code>, and this page loads it from there by itself.
+                        It stays on this PC. You can also load a file by hand.
                     </div>
                     <button onClick={() => fileInput.current?.click()} style={button}>Load lore file</button>
                     {error && <div style={{ fontSize: 12, color: "#e06050" }}>{error}</div>}
@@ -121,7 +144,7 @@ export default function Units({ races }) {
                 {selected && (
                     <div style={{ maxWidth: 720 }}>
                         <div style={{ fontSize: 9, letterSpacing: 4, color: raceColor(selected.race), textTransform: "uppercase", marginBottom: 5 }}>{selected.race} · {selected.type}</div>
-                        <div style={{ fontSize: 24, color: t.text1, marginBottom: 16 }}>{selected.name}</div>
+                        <div className="gk-title" style={{ fontSize: 24, color: t.text1, marginBottom: 16 }}>{selected.name}</div>
                         {selected.summary && (
                             <div style={{ fontSize: 13, color: t.text3, fontStyle: "italic", lineHeight: 1.7, marginBottom: 18, paddingLeft: 12, borderLeft: `2px solid ${t.border}`, whiteSpace: "pre-line" }}>{selected.summary}</div>
                         )}

@@ -26,7 +26,7 @@ export default function Notes({ notes, setNotes }) {
 
             <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "26px 34px", overflow: "hidden" }}>
                 <div style={{ fontSize: 9, letterSpacing: 5, color: t.text4, textTransform: "uppercase", marginBottom: 5 }}>Notebook</div>
-                <div style={{ fontSize: 22, color: t.text1, fontWeight: "normal", marginBottom: 16 }}>Notes & Thoughts</div>
+                <div className="gk-title" style={{ fontSize: 22, color: t.text1, fontWeight: "normal", marginBottom: 16 }}>Notes & Thoughts</div>
 
                 {current ? (
                     <>

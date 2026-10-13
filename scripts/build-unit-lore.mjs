@@ -1,9 +1,10 @@
 // Builds unit-lore.json from tables exported out of your own copy of
 // Total War: Warhammer III with RPFM (as TSV). The output stays on your PC:
-// load it in the app from the Units page. Do not commit it, the text belongs
-// to Creative Assembly / Games Workshop.
+// it is copied to the app's data folder, where the Unit Lore page picks it up
+// automatically. Do not commit it, the text belongs to Creative Assembly /
+// Games Workshop.
 //
-// Usage: node scripts/build-unit-lore.mjs <folder with RPFM TSV exports> [output file]
+// Usage: node scripts/build-unit-lore.mjs <folder with RPFM TSV exports> [extra copy]
 //
 // The folder needs (any file names, subfolders are fine):
 //   - main_units_tables        (from db.pack, db/main_units_tables)
@@ -11,6 +12,7 @@
 //   - the English .loc text    (from local_en.pack, each .loc exported as TSV)
 
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const [inputDir, outputArg] = process.argv.slice(2);
@@ -18,7 +20,11 @@ if (!inputDir) {
     console.error("Usage: node scripts/build-unit-lore.mjs <export folder> [output file]");
     process.exit(1);
 }
-const outputFile = outputArg ?? "unit-lore.json";
+// Must match UNIT_LORE_FILE in electron-main.js.
+const appData = process.env.APPDATA ?? (process.platform === "darwin"
+    ? path.join(os.homedir(), "Library", "Application Support")
+    : path.join(os.homedir(), ".config"));
+const appLoreFile = path.join(appData, "Grudgekeeper", "unit-lore.json");
 
 // Faction code inside unit keys (wh_main_dwf_inf_miners_0 -> dwf) to race name.
 const RACES = {
@@ -133,9 +139,12 @@ for (const mu of mainUnits) {
 const units = [...byRaceAndName.values()].sort((a, b) =>
     a.race.localeCompare(b.race) || a.name.localeCompare(b.name));
 
-fs.writeFileSync(outputFile, JSON.stringify({ format: "grudgekeeper-unit-lore", version: 1, generated: new Date().toISOString(), units }, null, 1));
+const json = JSON.stringify({ format: "grudgekeeper-unit-lore", version: 1, generated: new Date().toISOString(), units }, null, 1);
+fs.mkdirSync(path.dirname(appLoreFile), { recursive: true });
+fs.writeFileSync(appLoreFile, json);
+if (outputArg) fs.writeFileSync(outputArg, json);
 
 const counts = {};
 units.forEach((u) => { counts[u.race] = (counts[u.race] ?? 0) + 1; });
-console.log(`Wrote ${units.length} units to ${outputFile} (${skipped} skipped: naval, prologue/test, no name or no lore).`);
+console.log(`Wrote ${units.length} units to ${appLoreFile}${outputArg ? ` and ${outputArg}` : ""} (${skipped} skipped: naval, prologue/test, no name or no lore).`);
 Object.entries(counts).forEach(([race, n]) => console.log(`  ${race}: ${n}`));

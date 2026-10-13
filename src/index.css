@@ -8,6 +8,7 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 button {
@@ -17,4 +18,94 @@ button {
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
+}
+
+/* ---- Theme polish ------------------------------------------------------ */
+
+/* Page titles and display numbers use Cinzel, carved-in-stone capitals. */
+h1, h2, h3, .gk-title {
+  font-family: 'Cinzel', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+  letter-spacing: 0.06em;
+}
+
+.gk-display {
+  font-family: 'Cinzel', 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+}
+
+/* Buttons brighten and lift a touch on hover, press down on click. */
+button {
+  transition: filter 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+button:not(:disabled):hover {
+  filter: brightness(1.22);
+}
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--gk-accent-rgb, 217, 162, 28), 0.35);
+}
+input:focus,
+textarea:focus {
+  border-color: rgba(var(--gk-accent-rgb, 217, 162, 28), 0.55) !important;
+}
+
+::selection {
+  background: rgba(var(--gk-accent-rgb, 217, 162, 28), 0.35);
+  color: #fff4d6;
+}
+
+/* Thin gold scrollbars instead of the default grey ones. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--gk-accent-rgb, 190, 120, 40), 0.3);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--gk-accent-rgb, 217, 162, 28), 0.5);
+  background-clip: content-box;
+}
+
+/* Sidebar navigation */
+.gk-nav {
+  position: relative;
+}
+.gk-nav:not(.gk-nav-active):hover {
+  background: linear-gradient(90deg, rgba(var(--gk-accent-rgb, 217, 162, 28), 0.08), transparent 85%) !important;
+}
+.gk-nav:not(.gk-nav-active):hover span,
+.gk-nav:not(.gk-nav-active):hover svg {
+  color: var(--gk-hover, #e8c068) !important;
+}
+.gk-nav svg {
+  transition: color 0.15s ease, filter 0.15s ease;
+}
+.gk-nav-active svg {
+  filter: drop-shadow(0 0 6px rgba(var(--gk-accent-rgb, 217, 162, 28), 0.55));
+}
+
+/* Each view fades up gently when you switch to it. */
+@keyframes gk-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+.gk-view {
+  animation: gk-enter 0.28s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gk-view { animation: none; }
+  button { transition: none; }
 }

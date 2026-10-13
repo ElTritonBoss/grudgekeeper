@@ -41,6 +41,7 @@ export default function AllFactions({ campaigns, checked, setChecked, activeCamp
         if (filter === "fertig") return done;
         if (filter === "leicht") return e.difficulty <= 2;
         if (filter === "schwer") return e.difficulty >= 4;
+        if (filter === "dlc") return !e.owned;
         return true;
     });
     if (sortBy === "tier") entries = [...entries].sort((a, b) => a.tier - b.tier);
@@ -69,7 +70,7 @@ export default function AllFactions({ campaigns, checked, setChecked, activeCamp
 
             <div style={{ padding: "13px 34px", borderBottom: `1px solid ${t.border}`, display: "flex", gap: 10, alignItems: "center", flexShrink: 0, flexWrap: "wrap" }}>
                 <div style={{ display: "flex", gap: 5, flex: 1, flexWrap: "wrap" }}>
-                    {[["alle", "All"], ["offen", "Open"], ["fertig", "Done"], ["leicht", "Easy (1-2)"], ["schwer", "Hard (4-5)"]].map(([id, lbl]) => (
+                    {[["alle", "All"], ["offen", "Open"], ["fertig", "Done"], ["leicht", "Easy (1-2)"], ["schwer", "Hard (4-5)"], ["dlc", "🔒 Needs DLC"]].map(([id, lbl]) => (
                         <button key={id} onClick={() => setFilter(id)} style={{ fontSize: 11, padding: "5px 12px", borderRadius: 20, cursor: "pointer", fontFamily: "inherit", background: filter === id ? t.accentGlow : "transparent", border: `1px solid ${filter === id ? t.accent : t.border}`, color: filter === id ? t.accent : t.text3, transition: "all 0.15s" }}>{lbl}</button>
                     ))}
                 </div>
@@ -91,7 +92,7 @@ export default function AllFactions({ campaigns, checked, setChecked, activeCamp
                     const victory = getVictory(checked[key]);
                     const isPlaying = activeCampaign === e.id;
                     return (
-                        <div key={e.id} style={{ display: "grid", gridTemplateColumns: "24px 165px 150px 108px 86px 76px 1fr 140px", gap: 10, padding: "10px 10px", alignItems: "center", borderBottom: `1px solid ${t.border}`, background: isPlaying ? `${e.tierColor}08` : "transparent", opacity: done ? 0.58 : 1, borderRadius: 5 }}>
+                        <div key={e.id} style={{ display: "grid", gridTemplateColumns: "24px 165px 150px 108px 86px 76px 1fr 140px", gap: 10, padding: "10px 10px", alignItems: "center", borderBottom: `1px solid ${t.border}`, background: isPlaying ? `${e.tierColor}08` : "transparent", opacity: done ? 0.58 : !e.owned ? 0.5 : 1, borderRadius: 5 }}>
                             <div onClick={() => { if (done) { uncomplete(key); } else { setVictoryModal({ key, faction: `${e.faction} – ${e.lord}` }); } }} style={{ width: 20, height: 20, borderRadius: 4, cursor: "pointer", border: `1px solid ${done ? "#4ade80" : t.inputBorder}`, background: done ? "rgba(74,222,128,0.15)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#4ade80" }}>{done && "✓"}</div>
                             <div style={{ fontSize: 13, color: done ? t.text5 : t.text1, textDecoration: done ? "line-through" : "none" }}>{e.faction}</div>
                             <div style={{ fontSize: 12, color: e.tierColor }}><span style={{ fontSize: 10, color: t.text4, marginRight: 5 }}>{e.queue}.</span>{e.lord}</div>
@@ -101,7 +102,7 @@ export default function AllFactions({ campaigns, checked, setChecked, activeCamp
                             <div style={{ display: "flex", gap: 4 }}>{e.tags.slice(0, 2).map((tag) => <Tag key={tag} label={tag} color={e.tierColor} />)}</div>
                             <div style={{ display: "flex", gap: 5, alignItems: "center" }}>
                                 {done && victory && <span style={{ fontSize: 9, padding: "1px 6px", borderRadius: 10, background: `${VICTORY_COLORS[victory]}18`, color: VICTORY_COLORS[victory], border: `1px solid ${VICTORY_COLORS[victory]}40`, whiteSpace: "nowrap" }}>🏆 {victory}</span>}
-                                <button onClick={() => { const n = isPlaying ? null : e.id; save("tww3_activeCampaign", n); setActiveCampaign(n); }} style={{ fontSize: 10, padding: "4px 10px", borderRadius: 5, cursor: "pointer", background: isPlaying ? `${e.tierColor}20` : "transparent", border: `1px solid ${isPlaying ? e.tierColor + "60" : t.border}`, color: isPlaying ? e.tierColor : t.text4, fontFamily: "inherit" }}>{isPlaying ? "▶ Active" : "▷ Start"}</button>
+                                {!e.owned && !done ? <span title={`Needs ${e.pack}`} style={{ fontSize: 10, color: "#ef4444", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>🔒 {e.pack}</span> : <button onClick={() => { const n = isPlaying ? null : e.id; save("tww3_activeCampaign", n); setActiveCampaign(n); }} style={{ fontSize: 10, padding: "4px 10px", borderRadius: 5, cursor: "pointer", background: isPlaying ? `${e.tierColor}20` : "transparent", border: `1px solid ${isPlaying ? e.tierColor + "60" : t.border}`, color: isPlaying ? e.tierColor : t.text4, fontFamily: "inherit" }}>{isPlaying ? "▶ Active" : "▷ Start"}</button>}
                             </div>
                         </div>
                     );

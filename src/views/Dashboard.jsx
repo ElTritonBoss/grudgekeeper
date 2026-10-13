@@ -151,9 +151,10 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, d
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
 
-    const rc = camp.crest?.[0] || camp.raceColor || camp.tierColor;
-    const cl = camp.tierColor;
     const active = mode === "active";
+    // With faction colours on, the theme already carries a readable accent from the active lord's crest.
+    const rc = (active && t.faction ? t.accent : null) || camp.raceColor || camp.tierColor;
+    const cl = camp.tierColor;
     const lordNo = lords.findIndex((l) => l.lordId === camp.lordId) + 1;
     const style = camp.styles?.[0];
 
@@ -183,7 +184,7 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, d
                         <div style={{ fontSize: 34, color: t.text1, lineHeight: 1.05, marginBottom: 6 }}>{camp.faction}</div>
                         <div style={{ fontSize: 16, color: rc, marginBottom: 12 }}>
                             {camp.lord}
-                            <span style={{ fontSize: 11, color: t.text4, marginLeft: 10 }}>Lord {lordNo} of {lords.length} · {camp.game} · {camp.dlc}</span>
+                            <span style={{ fontSize: 11, color: t.text4, marginLeft: 10 }}>Lord {lordNo} of {lords.length} · {camp.game} · {camp.dlcLabel}</span>
                         </div>
                         <div style={{ display: "flex", alignItems: "center", gap: 18, flexWrap: "wrap", fontSize: 11, color: t.text3 }}>
                             <span style={{ display: "flex", alignItems: "center", gap: 7 }}>
@@ -261,20 +262,21 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, d
 export default function Dashboard({ roadmap, campaigns, checked, setChecked, activeCampaign, setActiveCampaign, activeSince, sessionLog, setSessionLog, onRandom, onOpenRoadmap }) {
     const t = useTheme();
 
-    const allEntries = campaigns;
+    // Lords from DLC you don't own only count once they're done.
+    const allEntries = campaigns.filter((e) => e.owned || isDone(checked[e.lordId]));
     const getKey = (entry) => entry.lordId;
 
     const done = allEntries.filter((e) => isDone(checked[getKey(e)])).length;
     const total = allEntries.length;
     const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
-    const currentCamp = allEntries.find((e) => e.id === activeCampaign);
+    const currentCamp = campaigns.find((e) => e.id === activeCampaign);
 
     // The easiest faction cards still open on the roadmap, other than the faction being played.
-    const openCards = roadmap.flatMap((r) => r.entries).filter((e) => !e.complete && e.factionId !== currentCamp?.factionId);
-    const currentTier = roadmap.find((r) => r.entries.some((e) => !e.complete));
+    const openCards = roadmap.flatMap((r) => r.entries).filter((e) => !e.complete && !e.needsDlc && e.factionId !== currentCamp?.factionId);
+    const currentTier = roadmap.find((r) => r.entries.some((e) => !e.complete && !e.needsDlc));
     const heroCamp = currentCamp ?? openCards[0];
-    const heroLords = heroCamp ? allEntries.filter((e) => e.factionId === heroCamp.factionId) : [];
+    const heroLords = heroCamp ? campaigns.filter((e) => e.factionId === heroCamp.factionId) : [];
 
     const start = (id) => setActiveCampaign(id);
 

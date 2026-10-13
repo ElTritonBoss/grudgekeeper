@@ -80,7 +80,7 @@ export default function Statistics({ campaigns, checked, customList }) {
                 ].map(s => (
                     <div key={s.label} style={{ background: t.bg3, border: `1px solid ${t.border}`, borderRadius: 10, padding: "16px 18px" }}>
                         <div style={{ fontSize: 10, color: t.text4, letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>{s.label}</div>
-                        <div style={{ fontSize: 28, color: s.color, fontWeight: "normal", lineHeight: 1, marginBottom: 3 }}>{s.value}</div>
+                        <div className="gk-display" style={{ fontSize: 28, color: s.color, fontWeight: "normal", lineHeight: 1, marginBottom: 3 }}>{s.value}</div>
                         <div style={{ fontSize: 11, color: t.text3 }}>{s.sub}</div>
                     </div>
                 ))}
