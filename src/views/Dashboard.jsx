@@ -137,7 +137,7 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, d
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
 
-    const rc = camp.raceColor || camp.tierColor;
+    const rc = camp.crest?.[0] || camp.raceColor || camp.tierColor;
     const cl = camp.tierColor;
     const active = mode === "active";
     const lordNo = lords.findIndex((l) => l.lordId === camp.lordId) + 1;
