@@ -3,6 +3,9 @@ import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { createRequire } from "node:module";
+
+const { campaignLogsHandler } = createRequire(import.meta.url)("./campaign-logs.cjs");
 
 // Same location electron-main.js serves the unit lore file from.
 const appData = process.env.APPDATA ?? (process.platform === "darwin"
@@ -19,6 +22,7 @@ function localUnitLore() {
         res.setHeader("Content-Type", "application/json");
         fs.createReadStream(unitLoreFile).pipe(res);
       });
+      server.middlewares.use("/local/campaign-logs", campaignLogsHandler);
     },
   };
 }

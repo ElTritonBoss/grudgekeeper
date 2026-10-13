@@ -3,6 +3,7 @@ const path = require("path");
 const express = require("express");
 const http = require("http");
 const https = require("https");
+const { campaignLogsHandler } = require("./campaign-logs.cjs");
 
 const isDev = process.env.NODE_ENV === "development";
 const PORT = 3991;
@@ -21,6 +22,8 @@ function startServer() {
                 if (err && !res.headersSent) res.status(404).end();
             });
         });
+        // Live campaign logs written by the logger mod (mod/grudgekeeper_logger).
+        server.use("/local/campaign-logs", campaignLogsHandler);
         server.use(express.static(path.join(__dirname, "dist")));
         http.createServer(server).listen(PORT, () => resolve());
     });
