@@ -139,7 +139,7 @@ function LordDetails({ lord, details, color, showHeroes = true }) {
     );
 }
 
-function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, view, onView, color }) {
+function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onAddMany, onRemove, view, onView, color }) {
     const t = useTheme();
     const [selected, setSelected] = useState(main.lordId);
     const [picking, setPicking] = useState(false);
@@ -147,6 +147,7 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, view,
 
     const tabs = [main, ...extras];
     const asTabs = view === "tabs";
+    const heroesInRow = !asTabs && extras.length > 0;
     const current = (asTabs && tabs.find((l) => l.lordId === selected)) || main;
 
     // Lords you can still add: same faction first, then everyone else grouped by faction.
@@ -192,7 +193,10 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, view,
                         {groups.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>No lords found.</div>}
                         {groups.map((g) => (
                             <div key={g.faction} style={{ marginBottom: 8 }}>
-                                <div style={{ fontSize: 10, letterSpacing: 2, color: g.faction === main.faction ? color : t.text4, textTransform: "uppercase", padding: "6px 0 3px" }}>{g.faction}{g.faction === main.faction ? " · same faction" : ""}</div>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "6px 0 3px" }}>
+                                    <span style={{ fontSize: 10, letterSpacing: 2, color: g.faction === main.faction ? color : t.text4, textTransform: "uppercase" }}>{g.faction}{g.faction === main.faction ? " · same faction" : ""}</span>
+                                    {g.lords.length > 1 && <span onClick={() => { onAddMany(g.lords.map((l) => l.lordId)); setPicking(false); }} style={{ fontSize: 11, color, cursor: "pointer" }}>＋ Add all {g.lords.length}</span>}
+                                </div>
                                 {g.lords.map((l) => (
                                     <div key={l.lordId} onClick={() => { onAdd(l.lordId); setSelected(l.lordId); setPicking(false); }} style={{ fontSize: 13, color: t.text2, padding: "6px 8px", borderRadius: 6, cursor: "pointer", display: "flex", justifyContent: "space-between" }}>
                                         <span>{l.lord}</span>
@@ -204,7 +208,7 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, view,
                     </div>
                 </div>
             ) : (
-                <LordDetails key={current.lordId} lord={current.lord} details={detailsFor(current.lordId)} color={color} />
+                <LordDetails key={current.lordId} lord={current.lord} details={detailsFor(current.lordId)} color={color} showHeroes={!(heroesInRow && current.lordId === main.lordId)} />
             )}
         </div>
     );
@@ -228,12 +232,40 @@ function ExtraLordsRow({ main, extras, detailsFor, color }) {
     );
 }
 
+function HeroesRow({ details, color }) {
+    const t = useTheme();
+    const heroes = (details?.heroes ?? []).filter((h) => !h.unverified);
+    const possible = (details?.heroes ?? []).filter((h) => h.unverified);
+    if (!heroes.length && !possible.length) return null;
+    return (
+        <div style={{ marginTop: 18 }}>
+            <Label>★ Legendary heroes</Label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 16 }}>
+                {heroes.map((h) => (
+                    <div key={h.name} style={{ background: t.bg3, border: `1px solid ${color}30`, borderLeft: `3px solid ${color}90`, borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ fontSize: 16, color: t.text1 }}>{h.name}</div>
+                        <div style={{ fontSize: 11, color: t.text4, marginBottom: 8 }}>{h.type}</div>
+                        {h.unlock && <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.6 }}>{h.unlock}</div>}
+                    </div>
+                ))}
+                {possible.map((h) => (
+                    <div key={h.name} style={{ background: t.bg3, border: `1px dashed ${t.border}`, borderRadius: 10, padding: "14px 16px", opacity: 0.75 }}>
+                        <div style={{ fontSize: 16, color: t.text2 }}>{h.name}</div>
+                        <div style={{ fontSize: 11, color: t.text4, marginBottom: 8 }}>{h.type}</div>
+                        <div style={{ fontSize: 11, color: t.text4, fontStyle: "italic" }}>Allowed for this faction. Unlock not confirmed.</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function Label({ children, color }) {
     const t = useTheme();
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, allLords, detailsFor, onAddLord, onRemoveLord, lordsView, onLordsView, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, allLords, detailsFor, onAddLord, onAddLords, onRemoveLord, lordsView, onLordsView, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
@@ -311,10 +343,11 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, al
                         </div>
                         {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
                     </div>
-                    {active && <LordsPanel main={camp} extras={extras} allLords={allLords} detailsFor={detailsFor} onAdd={onAddLord} onRemove={onRemoveLord} view={lordsView} onView={onLordsView} color={rc} />}
+                    {active && <LordsPanel main={camp} extras={extras} allLords={allLords} detailsFor={detailsFor} onAdd={onAddLord} onAddMany={onAddLords} onRemove={onRemoveLord} view={lordsView} onView={onLordsView} color={rc} />}
                 </div>
 
                 {active && lordsView === "rows" && extras.length > 0 && <ExtraLordsRow main={camp} extras={extras} detailsFor={detailsFor} color={rc} />}
+                {active && lordsView === "rows" && extras.length > 0 && <HeroesRow details={detailsFor(camp.lordId)} color={rc} />}
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16, marginTop: 18 }}>
                     {active && !completing && (
@@ -400,7 +433,8 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
     const [extraLords, setExtraLords] = usePersist("tww3_extraLords", {});
     const campKey = currentCamp?.lordId;
     const extras = (extraLords[campKey] ?? []).map((id) => campaigns.find((c) => c.lordId === id)).filter(Boolean);
-    const addLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: [...(p[campKey] ?? []), id] }));
+    const addLords = (ids) => setExtraLords((p) => ({ ...p, [campKey]: [...new Set([...(p[campKey] ?? []), ...ids])] }));
+    const addLord = (id) => addLords([id]);
     const removeLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: (p[campKey] ?? []).filter((x) => x !== id) }));
     const [lordsView, setLordsView] = usePersist("tww3_lordsView", "rows");
     const detailsFor = (id) => lordDetails?.lords?.[id] ?? (lordDetails ? {} : null);
@@ -452,6 +486,7 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     allLords={campaigns}
                     detailsFor={detailsFor}
                     onAddLord={addLord}
+                    onAddLords={addLords}
                     onRemoveLord={removeLord}
                     lordsView={lordsView}
                     onLordsView={setLordsView}
