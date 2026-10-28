@@ -77,7 +77,7 @@ function SessionLog({ entries, onAdd, onDelete, color }) {
     );
 }
 
-function LordDetails({ lord, details, color }) {
+function LordDetails({ lord, details, color, showHeroes = true }) {
     const t = useTheme();
     const panel = { background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" };
 
@@ -117,7 +117,7 @@ function LordDetails({ lord, details, color }) {
                     </div>
                 ))}
             </div>
-            <div style={panel}>
+            {showHeroes && <div style={panel}>
                 <Label color={color}>★ Legendary heroes</Label>
                 {heroes.length === 0 && possible.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None found for this faction."}</div>}
                 {heroes.map((h) => (
@@ -134,19 +134,20 @@ function LordDetails({ lord, details, color }) {
                         </div>
                     </div>
                 )}
-            </div>
+            </div>}
         </div>
     );
 }
 
-function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, color }) {
+function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, view, onView, color }) {
     const t = useTheme();
     const [selected, setSelected] = useState(main.lordId);
     const [picking, setPicking] = useState(false);
     const [query, setQuery] = useState("");
 
     const tabs = [main, ...extras];
-    const current = tabs.find((l) => l.lordId === selected) ?? main;
+    const asTabs = view === "tabs";
+    const current = (asTabs && tabs.find((l) => l.lordId === selected)) || main;
 
     // Lords you can still add: same faction first, then everyone else grouped by faction.
     const q = query.trim().toLowerCase();
@@ -166,7 +167,7 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, color
         <div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
                 {tabs.map((l) => (
-                    <div key={l.lordId} style={tab(!picking && l.lordId === current.lordId)} onClick={() => { setSelected(l.lordId); setPicking(false); }}>
+                    <div key={l.lordId} style={{ ...tab(!picking && l.lordId === current.lordId), cursor: asTabs ? "pointer" : "default" }} onClick={() => { if (asTabs) setSelected(l.lordId); setPicking(false); }}>
                         <span>{l.lord}</span>
                         {l.lordId !== main.lordId && (
                             <span title="Remove from the Dashboard" onClick={(e) => { e.stopPropagation(); onRemove(l.lordId); }} style={{ fontSize: 10, opacity: 0.6, cursor: "pointer" }}>✕</span>
@@ -174,6 +175,13 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, color
                     </div>
                 ))}
                 <button onClick={() => { setPicking(!picking); setQuery(""); }} style={{ ...tab(picking), borderStyle: "dashed" }}>＋ Add lord</button>
+                {extras.length > 0 && (
+                    <div style={{ marginLeft: "auto", display: "flex", border: `1px solid ${t.border}`, borderRadius: 20, overflow: "hidden" }} title="Show added lords as a row under the campaign, or switch between them like tabs">
+                        {[["rows", "▤ Row"], ["tabs", "⇆ Tabs"]].map(([id, label]) => (
+                            <button key={id} onClick={() => onView(id)} style={{ fontSize: 11, padding: "5px 11px", border: "none", cursor: "pointer", fontFamily: "inherit", background: view === id ? `${color}22` : "transparent", color: view === id ? color : t.text4 }}>{label}</button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {picking ? (
@@ -202,12 +210,30 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, color
     );
 }
 
+function ExtraLordsRow({ main, extras, detailsFor, color }) {
+    const t = useTheme();
+    return (
+        <div style={{ marginTop: 18 }}>
+            <Label>Lords in this campaign</Label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 16 }}>
+                {extras.map((l) => (
+                    <div key={l.lordId} style={{ background: t.bg3, border: `1px solid ${color}30`, borderLeft: `3px solid ${color}90`, borderRadius: 10, padding: "14px 16px" }}>
+                        <div style={{ fontSize: 17, color: t.text1, marginBottom: 2 }}>{l.lord}</div>
+                        <div style={{ fontSize: 11, color: t.text4, marginBottom: 10 }}>{l.faction} · {l.dlcLabel}</div>
+                        <LordDetails lord={l.lord} details={detailsFor(l.lordId)} color={color} showHeroes={l.faction !== main.faction} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
 function Label({ children, color }) {
     const t = useTheme();
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, allLords, detailsFor, onAddLord, onRemoveLord, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, allLords, detailsFor, onAddLord, onRemoveLord, lordsView, onLordsView, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
@@ -285,10 +311,12 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, al
                         </div>
                         {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
                     </div>
-                    {active && <LordsPanel main={camp} extras={extras} allLords={allLords} detailsFor={detailsFor} onAdd={onAddLord} onRemove={onRemoveLord} color={rc} />}
+                    {active && <LordsPanel main={camp} extras={extras} allLords={allLords} detailsFor={detailsFor} onAdd={onAddLord} onRemove={onRemoveLord} view={lordsView} onView={onLordsView} color={rc} />}
                 </div>
 
-                <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16 }}>
+                {active && lordsView === "rows" && extras.length > 0 && <ExtraLordsRow main={camp} extras={extras} detailsFor={detailsFor} color={rc} />}
+
+                <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16, marginTop: 18 }}>
                     {active && !completing && (
                         <>
                             <button onClick={() => setCompleting(true)} style={btn("#4ade80", true)}>🏆 Complete campaign</button>
@@ -374,6 +402,7 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
     const extras = (extraLords[campKey] ?? []).map((id) => campaigns.find((c) => c.lordId === id)).filter(Boolean);
     const addLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: [...(p[campKey] ?? []), id] }));
     const removeLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: (p[campKey] ?? []).filter((x) => x !== id) }));
+    const [lordsView, setLordsView] = usePersist("tww3_lordsView", "rows");
     const detailsFor = (id) => lordDetails?.lords?.[id] ?? (lordDetails ? {} : null);
 
     const complete = (victory, kills) => {
@@ -424,6 +453,8 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     detailsFor={detailsFor}
                     onAddLord={addLord}
                     onRemoveLord={removeLord}
+                    lordsView={lordsView}
+                    onLordsView={setLordsView}
                     onComplete={complete}
                     onEnd={() => setActiveCampaign(null)}
                     onStart={() => start(heroCamp.id)}
