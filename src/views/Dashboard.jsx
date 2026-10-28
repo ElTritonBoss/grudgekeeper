@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { load, save } from "../hooks/usePersist";
+import usePersist, { load, save } from "../hooks/usePersist";
 import { useTheme } from "../context/ThemeContext";
 import { isDone, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
@@ -139,12 +139,75 @@ function LordDetails({ lord, details, color }) {
     );
 }
 
+function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onRemove, color }) {
+    const t = useTheme();
+    const [selected, setSelected] = useState(main.lordId);
+    const [picking, setPicking] = useState(false);
+    const [query, setQuery] = useState("");
+
+    const tabs = [main, ...extras];
+    const current = tabs.find((l) => l.lordId === selected) ?? main;
+
+    // Lords you can still add: same faction first, then everyone else grouped by faction.
+    const q = query.trim().toLowerCase();
+    const taken = new Set(tabs.map((l) => l.lordId));
+    const choices = allLords.filter((l) => !taken.has(l.lordId) && (!q || l.lord.toLowerCase().includes(q) || l.faction.toLowerCase().includes(q)));
+    const groups = [];
+    choices.forEach((l) => {
+        let g = groups.find((x) => x.faction === l.faction);
+        if (!g) groups.push(g = { faction: l.faction, lords: [] });
+        g.lords.push(l);
+    });
+    groups.sort((a, b) => (b.faction === main.faction) - (a.faction === main.faction) || a.faction.localeCompare(b.faction));
+
+    const tab = (active) => ({ display: "flex", alignItems: "center", gap: 6, fontSize: 12, padding: "5px 12px", borderRadius: 20, cursor: "pointer", fontFamily: "inherit", background: active ? `${color}22` : "transparent", border: `1px solid ${active ? color + "80" : t.border}`, color: active ? color : t.text3 });
+
+    return (
+        <div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                {tabs.map((l) => (
+                    <div key={l.lordId} style={tab(!picking && l.lordId === current.lordId)} onClick={() => { setSelected(l.lordId); setPicking(false); }}>
+                        <span>{l.lord}</span>
+                        {l.lordId !== main.lordId && (
+                            <span title="Remove from the Dashboard" onClick={(e) => { e.stopPropagation(); onRemove(l.lordId); }} style={{ fontSize: 10, opacity: 0.6, cursor: "pointer" }}>✕</span>
+                        )}
+                    </div>
+                ))}
+                <button onClick={() => { setPicking(!picking); setQuery(""); }} style={{ ...tab(picking), borderStyle: "dashed" }}>＋ Add lord</button>
+            </div>
+
+            {picking ? (
+                <div style={{ background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" }}>
+                    <Label color={color}>Add a lord to this campaign</Label>
+                    <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search lords or factions..." style={{ width: "100%", boxSizing: "border-box", fontSize: 13, padding: "8px 10px", borderRadius: 7, background: t.input, border: `1px solid ${t.inputBorder}`, color: t.text1, fontFamily: "inherit", outline: "none", marginBottom: 8 }} />
+                    <div style={{ maxHeight: 330, overflowY: "auto" }}>
+                        {groups.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>No lords found.</div>}
+                        {groups.map((g) => (
+                            <div key={g.faction} style={{ marginBottom: 8 }}>
+                                <div style={{ fontSize: 10, letterSpacing: 2, color: g.faction === main.faction ? color : t.text4, textTransform: "uppercase", padding: "6px 0 3px" }}>{g.faction}{g.faction === main.faction ? " · same faction" : ""}</div>
+                                {g.lords.map((l) => (
+                                    <div key={l.lordId} onClick={() => { onAdd(l.lordId); setSelected(l.lordId); setPicking(false); }} style={{ fontSize: 13, color: t.text2, padding: "6px 8px", borderRadius: 6, cursor: "pointer", display: "flex", justifyContent: "space-between" }}>
+                                        <span>{l.lord}</span>
+                                        {!detailsFor(l.lordId)?.units && <span style={{ fontSize: 10, color: t.text4 }}>no skill data</span>}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <LordDetails key={current.lordId} lord={current.lord} details={detailsFor(current.lordId)} color={color} />
+            )}
+        </div>
+    );
+}
+
 function Label({ children, color }) {
     const t = useTheme();
     return <div style={{ fontSize: 9, letterSpacing: 3, color: color ?? t.text4, textTransform: "uppercase", marginBottom: 7 }}>{children}</div>;
 }
 
-function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
+function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, extras, allLords, detailsFor, onAddLord, onRemoveLord, onComplete, onEnd, onStart, onRandom, onOpenRoadmap }) {
     const t = useTheme();
     const [completing, setCompleting] = useState(false);
     const [kills, setKills] = useState("");
@@ -222,7 +285,7 @@ function Hero({ camp, lords, mode, since, log, onLogAdd, onLogDelete, details, o
                         </div>
                         {active && <SessionLog entries={log} onAdd={onLogAdd} onDelete={onLogDelete} color={rc} />}
                     </div>
-                    {active && <LordDetails lord={camp.lord} details={details} color={rc} />}
+                    {active && <LordsPanel main={camp} extras={extras} allLords={allLords} detailsFor={detailsFor} onAdd={onAddLord} onRemove={onRemoveLord} color={rc} />}
                 </div>
 
                 <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", borderTop: `1px solid ${t.border}`, paddingTop: 16 }}>
@@ -305,6 +368,14 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
         setSessionLog((p) => ({ ...p, [key]: (p[key] ?? []).filter((e) => e.id !== id) }));
     };
 
+    // Extra lords shown next to the campaign lord (e.g. one you confederated), kept per campaign.
+    const [extraLords, setExtraLords] = usePersist("tww3_extraLords", {});
+    const campKey = currentCamp?.lordId;
+    const extras = (extraLords[campKey] ?? []).map((id) => campaigns.find((c) => c.lordId === id)).filter(Boolean);
+    const addLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: [...(p[campKey] ?? []), id] }));
+    const removeLord = (id) => setExtraLords((p) => ({ ...p, [campKey]: (p[campKey] ?? []).filter((x) => x !== id) }));
+    const detailsFor = (id) => lordDetails?.lords?.[id] ?? (lordDetails ? {} : null);
+
     const complete = (victory, kills) => {
         const key = currentCamp.lordId;
         setChecked((p) => ({ ...p, [key]: kills != null ? { done: true, victory, kills } : { done: true, victory } }));
@@ -348,7 +419,11 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
                     log={sessionLog[heroCamp.lordId] ?? []}
                     onLogAdd={addLog}
                     onLogDelete={deleteLog}
-                    details={lordDetails?.lords?.[heroCamp.lordId] ?? (lordDetails ? {} : null)}
+                    extras={extras}
+                    allLords={campaigns}
+                    detailsFor={detailsFor}
+                    onAddLord={addLord}
+                    onRemoveLord={removeLord}
                     onComplete={complete}
                     onEnd={() => setActiveCampaign(null)}
                     onStart={() => start(heroCamp.id)}
