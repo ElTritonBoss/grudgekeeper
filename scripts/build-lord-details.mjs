@@ -12,9 +12,16 @@
 //   effect_bonus_value_unit_record_junctions, effect_bonus_value_unit_set_unit_ability_junctions,
 //   effect_bonus_value_unit_set_unit_attribute_junctions, unit_set_unit_ability_junctions,
 //   unit_set_unit_attribute_junctions, unit_set_to_unit_junctions, unique_agents,
-//   faction_agent_permitted_subtypes, main_units
+//   faction_agent_permitted_subtypes, main_units, land_units, units_to_exclusive_faction_permissions,
+//   ancillaries, ancillary_to_effects, ancillaries_included_agent_subtypes, character_ancillary_quest_ui_details,
+//   ancillary_sets, ancillary_set_ancillary_junctions, ancillary_set_effect_junctions, faction_starting_general_effects,
+//   effect_bundles, effect_bundles_to_effects_junctions, land_units_to_unit_abilites_junctions, unit_abilities
 // plus the English .loc text (local_en.pack, each .loc exported as TSV) and,
-// for legendary hero unlocks, the campaign scripts from data_script.pack (script/).
+// for legendary hero unlocks, quest items and starting grudges, the campaign scripts from data_script.pack (script/).
+//
+// Besides the unit buffs and heroes, each lord gets a "dossier": base stats, lord trait, battle abilities, quest items
+// with their set bonus, starting grudges, the full skill tree and "bestUnits", the units his own trait, items and
+// signature skills buff (skills every lord of the race shares are counted separately).
 //
 // Units: only skill effects tied to unit sets made of named units are kept, not
 // effects on whole unit classes, categories or the army. Skills that generic
@@ -122,7 +129,7 @@ for (const file of walk(inputDir)) {
 }
 const t = (name) => tables[`${name}_tables`] ?? [];
 const NEEDED = ["agent_subtypes", "frontend_faction_leaders", "character_skill_node_sets", "character_skill_node_set_items",
-    "character_skill_nodes", "character_skill_level_to_effects_junctions", "unit_set_to_unit_junctions", "main_units"];
+    "character_skill_nodes", "character_skill_level_to_effects_junctions", "unit_set_to_unit_junctions", "main_units", "land_units"];
 const missing = NEEDED.filter((n) => !t(n).length);
 console.log(`Read ${Object.keys(tables).length} tables, ${loc.size} text entries, ${scripts.length} scripts.`);
 if (missing.length || !loc.size) {
@@ -237,14 +244,47 @@ for (const set of t("character_skill_node_sets")) {
     }
 }
 
-function lordUnitBuffs(subtype, faction) {
-    const own = new Set();
-    const assoc = subtypes.get(subtype)?.associated_unit_override;
-    if (assoc) own.add(assoc);
-    const ownName = assoc ? unitName(assoc) : "";
-    const subculture = factions.get(faction)?.subculture;
+// Regiments of Renown are named "Name (Unit)" and only some factions may recruit them.
+const exclusiveUnits = new Set(t("units_to_exclusive_faction_permissions").map((r) => r.key));
+const isRegimentOfRenown = (unitKey, name) => exclusiveUnits.has(unitKey) && /\(.*\)\s*$/.test(name);
 
-    const skills = new Set();
+// "Longbeards (Great Weapons – Grudge Settlers)" -> "Longbeards (Great Weapons)", "Hammerers (Grudge Settlers)" -> "Hammerers".
+const baseUnitName = (name) => name.replace(/\s*[–-]\s*Grudge Settlers\)$/, ")").replace(/\s*\(Grudge Settlers\)$/, "");
+
+// Names of the specific units an effect hits (not the lord himself, other lords, or whole classes).
+function buffTargets(effectKey, own, ownName) {
+    const names = new Set();
+    for (const target of effectTargets.get(effectKey) ?? []) {
+        if (!target.units) continue;
+        for (const unitKey of target.units) {
+            // Not the lord himself, nor other lords that happen to be in a set (heroes stay).
+            if (own.has(unitKey) || SKIP.test(unitKey) || mainUnits.get(unitKey)?.caste === "lord") continue;
+            const name = unitName(unitKey);
+            if (!name || name === ownName || isRegimentOfRenown(unitKey, name)) continue;
+            // The Grudge Settlers versions are the same unit with a different recruitment cost.
+            names.add(baseUnitName(name));
+        }
+    }
+    return [...names];
+}
+
+const ROLES = {
+    melee_infantry: "Melee infantry", monstrous_infantry: "Monstrous infantry", missile_infantry: "Missile infantry",
+    warmachine: "Artillery & war machines", hero: "Heroes", monster: "Monsters", war_beast: "Monsters",
+    melee_cavalry: "Cavalry", missile_cavalry: "Cavalry", monstrous_cavalry: "Cavalry", chariot: "Chariots",
+};
+const landUnits = new Map(t("land_units").map((r) => [r.key, r]));
+const unitRoles = new Map();
+for (const mu of mainUnits.values()) {
+    const role = ROLES[mu.caste];
+    const name = role && baseUnitName(unitName(mu.unit));
+    if (name && !unitRoles.has(name)) unitRoles.set(name, role);
+}
+
+// skill key -> node key, for the skills in this lord's own tree (shared race lines left out unless --all-skills).
+function lordSkillNodes(subtype, faction, includeShared = allSkills) {
+    const subculture = factions.get(faction)?.subculture;
+    const skills = new Map();
     for (const set of nodeSetsBySubtype.get(subtype) ?? []) {
         if (set.faction_key && set.faction_key !== faction) continue;
         if (set.subculture && set.subculture !== subculture) continue;
@@ -253,39 +293,44 @@ function lordUnitBuffs(subtype, faction) {
             if (!node || node.visible_in_ui === "false") continue;
             if (node.faction_key && node.faction_key !== faction) continue;
             if (node.subculture && node.subculture !== subculture) continue;
-            if (allSkills || !genericSkills.has(node.character_skill_key)) skills.add(node.character_skill_key);
+            if (includeShared || !genericSkills.has(node.character_skill_key)) skills.set(node.character_skill_key, item.item);
         }
     }
+    return skills;
+}
+
+// Highest rank of each effect wins; most skills only have one rank.
+function topSkillEffects(skill) {
+    const top = new Map();
+    for (const e of skillEffects.get(skill) ?? []) {
+        const prev = top.get(e.effect_key);
+        if (!prev || Number(e.level) > Number(prev.level)) top.set(e.effect_key, e);
+    }
+    return [...top.values()];
+}
+
+function lordUnitBuffs(subtype, faction) {
+    const own = new Set();
+    const assoc = subtypes.get(subtype)?.associated_unit_override;
+    if (assoc) own.add(assoc);
+    const ownName = assoc ? unitName(assoc) : "";
+    const skills = new Set(lordSkillNodes(subtype, faction).keys());
 
     const byUnit = new Map();
     for (const skill of skills) {
         const skillName = cleanText(text(`character_skills_localised_name_${skill}`));
         if (!skillName) continue;
-        // Highest rank of each effect wins; most skills only have one rank.
-        const top = new Map();
-        for (const e of skillEffects.get(skill) ?? []) {
-            const prev = top.get(e.effect_key);
-            if (!prev || Number(e.level) > Number(prev.level)) top.set(e.effect_key, e);
-        }
-        const maxLevel = Math.max(...[...top.values()].map((e) => Number(e.level)));
-        for (const e of top.values()) {
+        const top = topSkillEffects(skill);
+        const maxLevel = Math.max(...top.map((e) => Number(e.level)));
+        for (const e of top) {
             if (/enemy/.test(e.effect_scope)) continue; // debuffs on the enemy's units
-            const targets = effectTargets.get(e.effect_key);
-            if (!targets) continue;
-            let effect = effectText(e.effect_key, e.value);
-            if (!effect) continue;
-            if (maxLevel > 1) effect += ` (rank ${e.level})`;
-            for (const target of targets) {
-                if (!target.units) continue;
-                for (const unitKey of target.units) {
-                    // Not the lord himself, nor other lords that happen to be in a set (heroes stay).
-                    if (own.has(unitKey) || SKIP.test(unitKey) || mainUnits.get(unitKey)?.caste === "lord") continue;
-                    const name = unitName(unitKey);
-                    if (!name || name === ownName) continue;
-                    if (!byUnit.has(name)) byUnit.set(name, []);
-                    const buffs = byUnit.get(name);
-                    if (!buffs.some((b) => b.skill === skillName && b.effect === effect)) buffs.push({ skill: skillName, effect });
-                }
+            const effect0 = effectText(e.effect_key, e.value);
+            if (!effect0) continue;
+            const effect = maxLevel > 1 ? `${effect0} (rank ${e.level})` : effect0;
+            for (const name of buffTargets(e.effect_key, own, ownName)) {
+                if (!byUnit.has(name)) byUnit.set(name, []);
+                const buffs = byUnit.get(name);
+                if (!buffs.some((b) => b.skill === skillName && b.effect === effect)) buffs.push({ skill: skillName, effect });
             }
         }
     }
@@ -493,6 +538,190 @@ function factionHeroes(faction) {
     return heroes.sort((a, b) => (a.unverified ? 1 : 0) - (b.unverified ? 1 : 0) || a.name.localeCompare(b.name));
 }
 
+// --- lord dossier: trait, abilities, quest items, skills, best units ---
+const usable = (s) => s && !/^[:\s+\-\d.%]*$/.test(s) && !s.startsWith("[HIDDEN]");
+const fixText = (s) => s.replace(/%%/g, "%");
+const effectLines = (effects) => [...new Set(effects.map((e) => fixText(effectText(e.effect ?? e.effect_key, e.value))).filter(usable))];
+const locText = (key) => cleanText(text(key));
+
+const bundleEffects = by(t("effect_bundles_to_effects_junctions"), "effect_bundle_key");
+const startingEffects = new Map(t("faction_starting_general_effects").map((r) => [r.agent_subtype, r.effect_bundle]));
+const ancillaryEffects = by(t("ancillary_to_effects"), "ancillary");
+const ancillaryName = (key) => locText(`ancillaries_onscreen_name_${key}`);
+const questUi = by(t("character_ancillary_quest_ui_details"), "agent_subtype");
+const includedGear = by(t("ancillaries_included_agent_subtypes"), "agent_subtype");
+const ancillaryRows = new Map(t("ancillaries").map((r) => [r.key, r]));
+const setPieces = by(t("ancillary_set_ancillary_junctions"), "set_key");
+const setEffects = by(t("ancillary_set_effect_junctions"), "set_key");
+const unitAbilityRows = new Map(t("unit_abilities").map((r) => [r.key, r]));
+const landAbilities = by(t("land_units_to_unit_abilites_junctions"), "land_unit");
+const SET_OF = new Map();
+for (const [setKey, pieces] of setPieces) for (const p of pieces) SET_OF.set(p.ancillary_key, setKey);
+
+// Quest items: wh_quests.lua lists, per lord, {"mission", item, mission key}. Immortal Empires file only.
+const questMissions = new Map();
+const questScript = scripts.find((f) => /main_warhammer[\\/]wh_quests\.lua$/i.test(f));
+if (questScript) {
+    let current = null;
+    for (const line of fs.readFileSync(questScript, "utf8").split(/\r?\n/)) {
+        const lord = /^\s*\["([\w]+)"\]\s*=\s*\{/.exec(line);
+        if (lord) current = lord[1];
+        const item = /\{\s*"mission"\s*,\s*"([^"]+)"\s*,\s*"([^"]+)"/.exec(line);
+        if (item && current) questMissions.set(`${current}/${item[1]}`, item[2]);
+    }
+} else console.warn("No script/campaign/main_warhammer/wh_quests.lua in the export; quest items will have no mission briefing.");
+
+// Starting grudges (Dwarfs): faction -> mission keys, Immortal Empires.
+const startingGrudges = new Map();
+const grudgeScript = scripts.find((f) => /wh3_campaign_grudges_starting_missions\.lua$/i.test(f));
+if (grudgeScript) {
+    const src = fs.readFileSync(grudgeScript, "utf8");
+    const at = /faction_missions\s*=\s*\{/.exec(src);
+    try {
+        const table = at ? parseLuaTable(src, src.indexOf("{", at.index)) : {};
+        for (const [faction, list] of Object.entries(table.main_warhammer ?? {})) startingGrudges.set(faction, asList(list));
+    } catch (e) { console.warn(`Could not read ${grudgeScript}: ${e.message}`); }
+}
+
+// "Unlock this lord" rituals (Dwarfs, Thrones of Decay): matched to the lord by name.
+const unlockRituals = [];
+for (const [key] of loc) {
+    const m = /^rituals_description_wh3_dlc25_dwf_ritual_legendary_lord_(\w+)$/.exec(key);
+    if (m) unlockRituals.push([m[1], locText(key)]);
+}
+
+const SKILL_GROUPS = [["Signature", null], ["Personal", /_(self|character|combat|deathblow)_/], ["Army", /_(army|battle)_/], ["Campaign", /_campaign_/]];
+const skillGroup = (nodeKey) => SKILL_GROUPS.slice(1).find(([, re]) => re.test(nodeKey))?.[0] ?? "Signature";
+
+function lordAbilities(landUnit) {
+    return (landAbilities.get(landUnit) ?? [])
+        .filter((a) => a.ability !== "wh3_main_unit_passive_single_entity")
+        .map((a) => ({
+            name: locText(`unit_abilities_onscreen_name_${a.ability}`),
+            kind: unitAbilityRows.get(a.ability)?.source_type === "passive" ? "passive" : "active",
+            text: locText(`unit_abilities_tooltip_text_${a.ability}`),
+        }))
+        .filter((a) => a.name);
+}
+
+function questItems(subtype) {
+    return [...(questUi.get(subtype) ?? [])].sort((a, b) => Number(a.rank) - Number(b.rank)).map((r) => {
+        const mission = questMissions.get(`${subtype}/${r.ancillary}`);
+        return {
+            name: ancillaryName(r.ancillary), key: r.ancillary, rank: Number(r.rank), battle: r.is_quest_battle === "true",
+            effects: effectLines(ancillaryEffects.get(r.ancillary) ?? []),
+            mission: mission ? locText(`missions_localised_title_${mission}`) : "",
+            brief: mission ? locText(`missions_localised_description_${mission}`) : "",
+        };
+    }).filter((i) => i.name);
+}
+
+// Units each lord gets the most out of: every skill, the lord trait, quest item and item set that
+// buffs a specific unit counts once; a unit buffed by several sources ranks higher. Skills from the
+// shared race lines (every Dwarf lord has them) are counted apart from the lord's own.
+function bestUnits(sources, own, ownName) {
+    const byUnit = new Map();
+    for (const src of sources) {
+        for (const e of src.effects) {
+            if (/enemy/.test(e.effect_scope ?? "")) continue;
+            const effect = fixText(effectText(e.effect_key ?? e.effect, e.value));
+            if (!usable(effect)) continue;
+            for (const unit of buffTargets(e.effect_key ?? e.effect, own, ownName)) {
+                if (!byUnit.has(unit)) byUnit.set(unit, new Map());
+                const bySource = byUnit.get(unit);
+                const id = `${src.kind}/${src.name}`;
+                if (!bySource.has(id)) bySource.set(id, { from: src.kind, source: src.name, shared: !!src.shared, effects: [] });
+                const entry = bySource.get(id);
+                if (!entry.effects.includes(effect)) entry.effects.push(effect);
+            }
+        }
+    }
+    return [...byUnit.entries()]
+        .map(([unit, bySource]) => {
+            const all = [...bySource.values()];
+            return {
+                unit, role: unitRoles.get(unit) ?? "Other",
+                own: all.filter((s) => !s.shared).map(({ from, source, effects }) => ({ from, source, effects })),
+                shared: all.filter((s) => s.shared).map((s) => s.source),
+            };
+        })
+        .sort((a, b) => b.own.length - a.own.length || b.shared.length - a.shared.length || a.unit.localeCompare(b.unit));
+}
+
+function lordDossier(hit) {
+    const subtype = hit.subtype;
+    const assoc = subtypes.get(subtype)?.associated_unit_override;
+    const landKey = assoc && mainUnits.get(assoc)?.land_unit;
+    const land = landUnits.get(landKey);
+    const own = new Set(assoc ? [assoc] : []);
+    const ownName = assoc ? unitName(assoc) : "";
+    const dossier = {};
+
+    if (land) {
+        dossier.quote = locText(`unit_description_short_texts_text_${land.short_description_text}`);
+        dossier.bio = locText(`unit_description_historical_texts_text_${land.historical_description_text}`);
+        dossier.stats = { "Melee attack": Number(land.melee_attack), "Melee defence": Number(land.melee_defence), "Charge bonus": Number(land.charge_bonus), Leadership: Number(land.morale) };
+        dossier.abilities = lordAbilities(landKey);
+    }
+    const blurb = hit.leaderKey && locText(`frontend_faction_leaders_frontend_description_${hit.leaderKey}`);
+    if (blurb) dossier.blurb = blurb;
+
+    const sources = [];
+    const bundle = startingEffects.get(subtype);
+    if (bundle) {
+        const effects = (bundleEffects.get(bundle) ?? []).map((e) => ({ effect_key: e.effect_key, effect_scope: e.effect_scope, value: e.value }));
+        dossier.trait = { name: locText(`effect_bundles_localised_title_${bundle}`), blurb: locText(`effect_bundles_localised_description_${bundle}`), effects: effectLines(effects) };
+        sources.push({ kind: "Trait", name: dossier.trait.name, effects });
+    }
+
+    const items = questItems(subtype);
+    if (items.length) {
+        dossier.items = items;
+        const setKey = items.map((i) => SET_OF.get(i.key)).find(Boolean);
+        for (const i of items) {
+            sources.push({ kind: "Item", name: i.name, effects: ancillaryEffects.get(i.key) ?? [] });
+        }
+        if (setKey) {
+            const effects = setEffects.get(setKey) ?? [];
+            dossier.set = {
+                name: locText(`ancillary_sets_name_${setKey}`), text: locText(`ancillary_sets_description_${setKey}`),
+                pieces: (setPieces.get(setKey) ?? []).map((p) => ancillaryName(p.ancillary_key)).filter(Boolean),
+                bonus: effectLines(effects.map((e) => ({ effect_key: e.effect_key, value: e.value }))),
+            };
+            sources.push({ kind: "Set", name: dossier.set.name, effects: effects.map((e) => ({ effect_key: e.effect_key, effect_scope: e.effect_scope, value: e.value })) });
+        }
+    }
+    const questKeys = new Set(items.map((i) => i.key));
+    const gear = (includedGear.get(subtype) ?? []).filter((g) => !questKeys.has(g.ancillary)).slice(0, 8).map((g) => ({
+        name: ancillaryName(g.ancillary), category: ancillaryRows.get(g.ancillary)?.category ?? "",
+        effects: effectLines(ancillaryEffects.get(g.ancillary) ?? []),
+    })).filter((g) => g.name);
+    if (gear.length) dossier.gear = gear;
+
+    const skills = [];
+    for (const [skill, nodeKey] of lordSkillNodes(subtype, hit.faction, true)) {
+        if (/all_mentor_lord/.test(nodeKey)) continue;
+        const name = locText(`character_skills_localised_name_${skill}`);
+        if (!name) continue;
+        const top = topSkillEffects(skill);
+        const shared = genericSkills.has(skill);
+        skills.push({ name, group: skillGroup(nodeKey), tier: Number(nodes.get(nodeKey)?.tier ?? 0), effects: effectLines(top), ...(shared && { shared: true }) });
+        sources.push({ kind: "Skill", name, effects: top, shared });
+    }
+    const groupOrder = SKILL_GROUPS.map(([g]) => g);
+    dossier.skills = skills.sort((a, b) => groupOrder.indexOf(a.group) - groupOrder.indexOf(b.group) || a.tier - b.tier);
+
+    const grudges = (hit.faction && startingGrudges.get(hit.faction)) || [];
+    if (grudges.length) {
+        dossier.grudges = grudges.map((k) => ({ title: locText(`missions_localised_title_${k}`), text: locText(`missions_localised_description_${k}`) })).filter((g) => g.title);
+    }
+    const ritual = unlockRituals.find(([w]) => subtype.includes(`_${w}`));
+    if (ritual) dossier.unlock = ritual[1];
+
+    dossier.bestUnits = bestUnits(sources, own, ownName).slice(0, 40);
+    return dossier;
+}
+
 // --- match the app's lords ---
 // Game names carry titles ("Emperor Karl Franz", "Tzarina Katarin"), so a lord
 // matches when one name's words all appear in the other's.
@@ -511,7 +740,7 @@ const SPECIAL = /chaos|_mp_|qb|invasion|_intro|prologue|rebel|separatist/;
 const candidates = [];
 for (const r of t("frontend_faction_leaders")) {
     if (!r.agent_subtype_record || !r.faction) continue;
-    candidates.push({ subtype: r.agent_subtype_record, faction: r.faction, special: SPECIAL.test(r.key) });
+    candidates.push({ subtype: r.agent_subtype_record, faction: r.faction, special: SPECIAL.test(r.key), leaderKey: r.key });
 }
 const inFrontend = new Set(candidates.map((c) => c.subtype));
 // Legendary lords nobody starts as (unlocked during a campaign): faction from their permissions, if any.
@@ -556,6 +785,7 @@ for (const row of readCsv(racesFile)) {
         faction: hit.faction,
         units: lordUnitBuffs(hit.subtype, hit.faction),
         heroes: hit.faction ? factionHeroes(hit.faction) : [],
+        ...lordDossier(hit),
     };
     if (!hit.faction) lord.note = "Not a starting lord, so there is no faction to list legendary heroes for.";
     lords[row.lordId] = lord;
@@ -569,13 +799,13 @@ for (const c of candidates) {
     matched.add(c.subtype);
     lords[c.subtype] = {
         name: heroName(c.subtype), gameName: heroName(c.subtype), subtype: c.subtype, faction: c.faction,
-        units: lordUnitBuffs(c.subtype, c.faction), heroes: factionHeroes(c.faction), notInApp: true,
+        units: lordUnitBuffs(c.subtype, c.faction), heroes: factionHeroes(c.faction), notInApp: true, ...lordDossier(c),
     };
     extra++;
 }
 if (extra) console.log(`Added ${extra} starting lords the app doesn't list (keyed by agent subtype).`);
 
-const json = JSON.stringify({ format: "grudgekeeper-lord-details", version: 1, generated: new Date().toISOString(), lords }, null, 1);
+const json = JSON.stringify({ format: "grudgekeeper-lord-details", version: 2, generated: new Date().toISOString(), lords });
 fs.mkdirSync(path.dirname(appDetailsFile), { recursive: true });
 fs.writeFileSync(appDetailsFile, json);
 if (outputArg) fs.writeFileSync(outputArg, json);

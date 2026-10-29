@@ -28,7 +28,11 @@ $LordTables = @(
     'faction_agent_permitted_subtypes', 'main_units', 'land_units', 'factions', 'cultures_subcultures',
     'character_skill_node_set_items', 'character_skill_nodes_skill_locks', 'unit_set_unit_ability_junctions',
     'unit_set_unit_attribute_junctions', 'frontend_faction_leaders', 'campaign_rituals', 'building_levels',
-    'unit_abilities', 'unit_attributes', 'campaign_character_arts'
+    'unit_abilities', 'unit_attributes', 'campaign_character_arts',
+    'ancillaries', 'ancillary_to_effects', 'ancillaries_included_agent_subtypes', 'character_ancillary_quest_ui_details',
+    'ancillary_sets', 'ancillary_set_ancillary_junctions', 'ancillary_set_effect_junctions', 'faction_starting_general_effects',
+    'effect_bundles', 'effect_bundles_to_effects_junctions', 'land_units_to_unit_abilites_junctions',
+    'units_to_exclusive_faction_permissions'
 )
 
 if (-not $SkipExport) {

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import usePersist, { load, save } from "../hooks/usePersist";
+import usePersist from "../hooks/usePersist";
 import { useTheme } from "../context/ThemeContext";
 import { isDone, VICTORIES, VICTORY_COLORS } from "../utils/constants";
 import DiffDots from "../components/DiffDots";
 import PressureBadge from "../components/PressureBadge";
 import CampaignLogTimeline from "../components/CampaignLogTimeline";
+import LordDetails from "../components/LordDetails";
 
 const DAY = 24 * 60 * 60 * 1000;
 const DETAILS_KEY = "tww3_lordDetails";
@@ -73,68 +74,6 @@ function SessionLog({ entries, onAdd, onDelete, color }) {
                     ))}
                 </div>
             )}
-        </div>
-    );
-}
-
-function LordDetails({ lord, details, color, showHeroes = true }) {
-    const t = useTheme();
-    const panel = { background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" };
-
-    if (!details) {
-        return (
-            <div style={{ ...panel, display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start", justifyContent: "center" }}>
-                <Label color={color}>Skill tree &amp; legendary heroes</Label>
-                <div style={{ fontSize: 13, color: t.text3, lineHeight: 1.65 }}>
-                    Which units {lord}'s skills buff and which legendary heroes you can unlock come from your own copy of the game.
-                    Run <code>scripts\refresh-game-data.ps1</code> once and they'll show up here. The data stays on this PC.
-                </div>
-            </div>
-        );
-    }
-
-    // The file lists units with their buffs; most skills hit several units, so show them per skill.
-    const skills = [];
-    (details.units ?? []).forEach((u) => u.buffs.forEach((b) => {
-        let s = skills.find((x) => x.skill === b.skill && x.effect === b.effect);
-        if (!s) skills.push(s = { skill: b.skill, effect: b.effect, units: [] });
-        if (!s.units.includes(u.unit)) s.units.push(u.unit);
-    }));
-    const heroes = (details.heroes ?? []).filter((h) => !h.unverified);
-    const possible = (details.heroes ?? []).filter((h) => h.unverified);
-    const row = { padding: "8px 0", borderTop: `1px solid ${t.border}` };
-
-    return (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <div style={panel}>
-                <Label color={color}>⚒ Units {lord}'s skills buff</Label>
-                {skills.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None of this lord's own skills target specific units."}</div>}
-                {skills.map((s) => (
-                    <div key={s.skill + s.effect} style={row}>
-                        <div style={{ fontSize: 13, color }}>{s.skill}</div>
-                        <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.55, marginBottom: 4 }}>{s.effect}</div>
-                        <div style={{ fontSize: 11, color: t.text3, lineHeight: 1.6 }}>{s.units.join(" · ")}</div>
-                    </div>
-                ))}
-            </div>
-            {showHeroes && <div style={panel}>
-                <Label color={color}>★ Legendary heroes</Label>
-                {heroes.length === 0 && possible.length === 0 && <div style={{ fontSize: 12, color: t.text4, fontStyle: "italic" }}>{details.note ?? "None found for this faction."}</div>}
-                {heroes.map((h) => (
-                    <div key={h.name} style={row}>
-                        <div style={{ fontSize: 14, color: t.text1 }}>{h.name} <span style={{ fontSize: 11, color: t.text4 }}>{h.type}</span></div>
-                        {h.unlock && <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.55 }}>{h.unlock}</div>}
-                    </div>
-                ))}
-                {possible.length > 0 && (
-                    <div style={{ ...row, opacity: 0.75 }}>
-                        <div style={{ fontSize: 10, letterSpacing: 2, color: t.text4, textTransform: "uppercase", marginBottom: 4 }} title="The game allows these heroes for this faction, but how they join is handled by campaign scripts the app can't read.">Possible · unlock not confirmed</div>
-                        <div style={{ fontSize: 12, color: t.text3, lineHeight: 1.6 }}>
-                            {possible.map((h) => `${h.name} (${h.type})`).join(" · ")}
-                        </div>
-                    </div>
-                )}
-            </div>}
         </div>
     );
 }
@@ -404,15 +343,14 @@ export default function Dashboard({ roadmap, campaigns, checked, setChecked, act
 
     // Skill-tree and hero details come from a file built from your own game install
     // (scripts/refresh-game-data.ps1), picked up from the app's data folder.
-    const [lordDetails, setLordDetails] = useState(() => load(DETAILS_KEY, null));
+    // The file is a few MB, so it is read from disk each time instead of being kept in localStorage.
+    const [lordDetails, setLordDetails] = useState(null);
     useEffect(() => {
+        try { localStorage.removeItem(DETAILS_KEY); } catch { /* storage unavailable */ }
         fetch(LOCAL_DETAILS_URL, { cache: "no-store" })
             .then((res) => (res.ok ? res.json() : null))
             .then((data) => {
                 if (data?.format !== "grudgekeeper-lord-details" || typeof data.lords !== "object") return;
-                const cached = load(DETAILS_KEY, null);
-                if (cached && cached.generated === data.generated) return;
-                save(DETAILS_KEY, data);
                 setLordDetails(data);
             })
             .catch(() => {});
