@@ -4,18 +4,47 @@
 # Game files are only read; nothing is saved back to them. The exports and the
 # two JSON files are game text (CA / GW): they stay on this PC and are gitignored.
 # Both files are written to %APPDATA%\Grudgekeeper, where the app loads them on its own.
+#
+# Mods: by default the mods enabled in the launcher (used_mods.txt next to Warhammer3.exe) are
+# exported too and merged over the vanilla tables in load order, the way the game does, so an
+# overhaul like SFO shows its own skills, stats and units. -Vanilla ignores mods; -ModPacks takes
+# explicit .pack paths instead (highest priority first).
 
 param(
     [string]$GameData = 'S:\SteamLibrary\steamapps\common\Total War WARHAMMER III\data',
     [string]$Repo     = (Split-Path $PSScriptRoot -Parent),
     [string]$Rpfm     = '',
-    [switch]$SkipExport
+    [switch]$SkipExport,
+    [string[]]$ModPacks,
+    [switch]$Vanilla
 )
 $ErrorActionPreference = 'Stop'
 if (-not $Rpfm) { $Rpfm = Join-Path $Repo 'tools\rpfm\rpfm_server.exe' }
 if (-not (Test-Path $Rpfm)) { $Rpfm = 'C:\Users\Nelson\grudgekeeper-src\tools\rpfm\rpfm_server.exe' }
 $UnitExport = Join-Path $Repo 'unit-export'
 $LordExport = Join-Path $Repo 'lord-export'
+$ModExport  = Join-Path $Repo 'mod-export'
+
+# Enabled mods, in load order, from the launcher's used_mods.txt.
+function Get-UsedMods($gameDir) {
+    $file = Join-Path $gameDir 'used_mods.txt'
+    if (-not (Test-Path $file)) { return @() }
+    $dirs = @((Join-Path $gameDir 'data'))
+    $packs = @()
+    foreach ($line in Get-Content $file) {
+        if ($line -match '^\s*add_working_directory\s+"([^"]+)"') { $dirs += $Matches[1] }
+        elseif ($line -match '^\s*mod\s+"([^"]+)"') {
+            $name = $Matches[1]
+            $hit = $dirs | ForEach-Object { Join-Path $_ $name } | Where-Object { Test-Path $_ } | Select-Object -First 1
+            if ($hit) { $packs += $hit } else { Write-Host "  (enabled mod $name not found, skipped)" }
+        }
+    }
+    $packs
+}
+if ($Vanilla) { $ModPacks = @() }
+elseif (-not $ModPacks) { $ModPacks = @(Get-UsedMods (Split-Path $GameData -Parent)) }
+if ($ModPacks) { Write-Host ("Mods, in load order: " + (($ModPacks | ForEach-Object { Split-Path $_ -Leaf }) -join ', ')) }
+else { Write-Host 'No mods: building from the vanilla tables.' }
 $fwd = { param($p) $p -replace '\\', '/' }
 
 # Tables lord-details.json needs (db.pack holds the DLC tables too in Warhammer III).
@@ -82,7 +111,7 @@ if (-not $SkipExport) {
         Call-Tool 'update_schemas' @{} | Out-Null
         Call-Tool 'set_game_selected' @{ game_name = 'warhammer_3'; rebuild_dependencies = $false } | Out-Null
 
-        foreach ($dir in $UnitExport, $LordExport) {
+        foreach ($dir in $UnitExport, $LordExport, $ModExport) {
             if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
             New-Item -ItemType Directory $dir | Out-Null
         }
@@ -108,7 +137,20 @@ if (-not $SkipExport) {
         Call-Tool 'open_packfiles' @{ paths = @($scr) } | Out-Null
         try { Export-Folders $scr @('script') $LordExport } catch { Write-Host "  (campaign scripts not readable: $_)" }
 
-        $n = (Get-ChildItem $UnitExport, $LordExport -Recurse -Filter *.tsv).Count
+        $i = 0
+        foreach ($mod in $ModPacks) {
+            $i++
+            $leaf = [IO.Path]::GetFileNameWithoutExtension($mod)
+            $dest = Join-Path $ModExport ('{0:D2}-{1}' -f $i, $leaf)
+            New-Item -ItemType Directory $dest | Out-Null
+            Write-Host "Exporting tables and text from mod $leaf..."
+            $mp = & $fwd $mod
+            Call-Tool 'open_packfiles' @{ paths = @($mp) } | Out-Null
+            try { Export-Folders $mp @('db') $dest } catch { Write-Host "  (no db tables in $leaf)" }
+            try { Export-Folders $mp @('text') $dest } catch { Write-Host "  (no text in $leaf)" }
+        }
+
+        $n = (Get-ChildItem $UnitExport, $LordExport, $ModExport -Recurse -Filter *.tsv).Count
         Write-Host "Exported $n TSV files."
     }
     finally {
@@ -118,8 +160,22 @@ if (-not $SkipExport) {
 
 Push-Location $Repo
 try {
+    $unitIn = 'unit-export'; $lordIn = 'lord-export'
+    $modDirs = @()
+    if (-not $Vanilla -and (Test-Path $ModExport)) {
+        $modDirs = @(Get-ChildItem $ModExport -Directory | Sort-Object Name | ForEach-Object { $_.FullName })
+    }
+    if ($modDirs) {
+        Write-Host 'Merging mod tables over the vanilla unit tables...'
+        node scripts/merge-mod-tables.mjs unit-export unit-export-merged @modDirs
+        if ($LASTEXITCODE) { throw 'Merging the unit tables failed.' }
+        Write-Host 'Merging mod tables over the vanilla lord tables...'
+        node scripts/merge-mod-tables.mjs lord-export lord-export-merged @modDirs
+        if ($LASTEXITCODE) { throw 'Merging the lord tables failed.' }
+        $unitIn = 'unit-export-merged'; $lordIn = 'lord-export-merged'
+    }
     Write-Host 'Building unit-lore.json...'
-    node scripts/build-unit-lore.mjs unit-export
+    node scripts/build-unit-lore.mjs $unitIn
     Write-Host 'Building lord-details.json...'
-    node scripts/build-lord-details.mjs lord-export
+    node scripts/build-lord-details.mjs $lordIn
 } finally { Pop-Location }

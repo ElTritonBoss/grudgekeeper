@@ -31,3 +31,7 @@ unit-export/
 # Lord details built from your own game files (never commit)
 lord-details.json
 lord-export/
+# Mod-pack exports and the merged tables built from them (never commit)
+mod-export/
+unit-export-merged/
+lord-export-merged/
