@@ -138,6 +138,9 @@ function Overview({ details, goals, color, panel, row }) {
                             <Bullets lines={goals[id]} color={color} />
                         </div>
                     ))}
+                    <div style={{ fontSize: 11, color: t.text4, fontStyle: "italic", lineHeight: 1.5, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+                        Vanilla goals from the game's campaign scripts. SFO's own scripts haven't been checked yet, so SFO may change these.
+                    </div>
                 </div>
             )}
         </div>
