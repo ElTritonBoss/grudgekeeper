@@ -55,10 +55,11 @@ export default function App() {
   const { data: racesCsv, loading: loadingRaces } = useCSV("/data/races.csv");
   const { data: dlcCsv, loading: loadingDlc } = useCSV("/data/dlc.csv");
   const { data: lordDlcCsv, loading: loadingLordDlc } = useCSV("/data/lord-dlc.csv");
+  const { data: victoryCsv, loading: loadingVictory } = useCSV("/data/victory.csv");
 
   const styles = loadingStyles ? [] : buildStyles(stylesCsv);
   const dlc = { products: buildProducts(dlcCsv), requirements: buildRequirements(lordDlcCsv), owned: ownedDlc };
-  const campaigns = loadingRoadmap || loadingRaces || loadingDlc || loadingLordDlc ? [] : buildCampaigns(roadmapCsv, racesCsv, styles, dlc);
+  const campaigns = loadingRoadmap || loadingRaces || loadingDlc || loadingLordDlc || loadingVictory ? [] : buildCampaigns(roadmapCsv, racesCsv, styles, dlc, victoryCsv);
   const roadmap = buildRoadmap(campaigns, checked);
   const races = loadingRaces ? [] : buildRaces(racesCsv);
 

@@ -72,7 +72,7 @@ function UnitsAndHeroes({ lord, details, color, showHeroes, panel, row }) {
     );
 }
 
-function Overview({ details, color, panel, row }) {
+function Overview({ details, goals, color, panel, row }) {
     const t = useTheme();
     const [bio, setBio] = useState(false);
     return (
@@ -127,6 +127,17 @@ function Overview({ details, color, panel, row }) {
                 <div style={panel}>
                     <Label color={color}>Unlocking this lord</Label>
                     <div style={{ fontSize: 12, color: t.text2, lineHeight: 1.55 }}>{details.unlock}</div>
+                </div>
+            )}
+            {goals && (
+                <div style={panel}>
+                    <Label color={color}>Victory goals · Immortal Empires</Label>
+                    {[["short", "Short victory"], ["long", "Long victory (after the short one)"]].map(([id, title]) => goals[id]?.length > 0 && (
+                        <div key={id} style={row}>
+                            <div style={{ fontSize: 13, color, marginBottom: 2 }}>{title}</div>
+                            <Bullets lines={goals[id]} color={color} />
+                        </div>
+                    ))}
                 </div>
             )}
         </div>
@@ -265,7 +276,7 @@ function SkillTree({ details, color, panel, row }) {
     );
 }
 
-export default function LordDetails({ lord, details, color, showHeroes = true }) {
+export default function LordDetails({ lord, details, goals = null, color, showHeroes = true }) {
     const t = useTheme();
     const panel = { background: t.bg2, border: `1px solid ${t.border}`, borderRadius: 9, padding: "14px 16px" };
     const row = { padding: "8px 0", borderTop: `1px solid ${t.border}` };
@@ -301,7 +312,7 @@ export default function LordDetails({ lord, details, color, showHeroes = true })
                     {tabs.map(([id, label]) => <button key={id} onClick={() => setTab(id)} style={pill(id === tab)}>{label}</button>)}
                 </div>
             )}
-            {tab === "overview" && <Overview details={details} color={color} panel={panel} row={row} />}
+            {tab === "overview" && <Overview details={details} goals={goals} color={color} panel={panel} row={row} />}
             {tab === "best" && <BestUnits lord={lord} details={details} color={color} panel={panel} />}
             {tab === "items" && <Items details={details} color={color} panel={panel} row={row} />}
             {tab === "skills" && <SkillTree details={details} color={color} panel={panel} row={row} />}

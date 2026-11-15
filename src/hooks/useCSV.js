@@ -44,9 +44,12 @@ export function buildStyles(csvRows) {
 // One campaign per legendary lord: faction-level text from roadmap.csv,
 // lord-level queue position, difficulty and notes from races.csv.
 // dlc = { products, requirements, owned } marks lords the player can't play yet.
-export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}, dlc = null) {
+// victoryRows (victory.csv) hold each lord's short and long victory goals.
+export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}, dlc = null, victoryRows = []) {
     const factions = {};
     roadmapRows.forEach((row) => { factions[row.race] = row; });
+    const goals = {};
+    victoryRows.forEach((r) => { ((goals[r.lordId] ??= { short: [], long: [] })[r.length] ??= []).push(r.goal); });
 
     const campaigns = raceRows.filter((r) => factions[r.race]).map((r) => {
         const f = factions[r.race];
@@ -71,6 +74,7 @@ export function buildCampaigns(roadmapRows, raceRows, stylesMap = {}, dlc = null
             difficulty,
             isNew: r.isNew === "1",
             note: r.note,
+            goals: goals[r.lordId] ?? null,
             tags: f.tags ? f.tags.split(";").map((t) => t.trim()) : [],
             length: f.length?.trim(),
             pressure: f.pressure?.trim(),
