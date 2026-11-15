@@ -22,6 +22,7 @@ export const ICONS = ["🏆", "⚔️", "🛡️", "👑", "💀", "🔥", "📜
 export const PRESETS = [
     { icon: "⚔️", title: "First Blood", rule: "count", count: 1 },
     { icon: "📜", title: "Grudges Settled", rule: "faction", target: "dwarfs" },
+    { icon: "🔥", title: "Da Biggest Waaagh!", rule: "faction", target: "greenskins" },
     { icon: "👑", title: "Ultimate Ruler", rule: "count", count: 5, victory: "Ultimate" },
     { icon: "💀", title: "Kingslayer", rule: "kills", count: 100 },
     { icon: "🌟", title: "Halfway There", rule: "count", count: 55 },

@@ -1,6 +1,7 @@
 // Race-specific ornament drawn along the top of the sidebar and the main area
-// while a campaign is active. Only Dwarfs have one so far: the stepped,
-// interlocking key pattern carved round Dwarf doors, shields and runestones.
+// while a campaign is active. Dwarfs get the stepped, interlocking key pattern
+// carved round Dwarf doors, shields and runestones; Greenskins get a row of
+// crude fangs between two rough-cut bars, like the teeth daubed on Orc shields.
 const DWARF_BAND = (
     <>
         <path d="M0 3h6v6h6V3h6v10H0" fill="none" />
@@ -10,7 +11,16 @@ const DWARF_BAND = (
     </>
 );
 
-const MOTIFS = { Dwarfs: DWARF_BAND };
+const GREENSKIN_BAND = (
+    <>
+        <path d="M0 2.5h36" fill="none" />
+        <path d="M0 13.5h36" fill="none" />
+        <path d="M2 3l3 7 3-7M11 3l4 9 4-9M22 3l3 7 3-7" stroke="none" />
+        <path d="M30 13l3-5 3 5" stroke="none" />
+    </>
+);
+
+const MOTIFS = { Dwarfs: DWARF_BAND, Greenskins: GREENSKIN_BAND };
 
 export const hasMotif = (race) => Boolean(MOTIFS[race]);
 

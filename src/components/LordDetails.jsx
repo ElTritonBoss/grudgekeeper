@@ -138,6 +138,9 @@ function Overview({ details, goals, color, panel, row }) {
                             <Bullets lines={goals[id]} color={color} />
                         </div>
                     ))}
+                    <div style={{ fontSize: 11, color: t.text4, fontStyle: "italic", lineHeight: 1.5, paddingTop: 8, borderTop: `1px solid ${t.border}` }}>
+                        From the game's campaign scripts. Checked against SFO Grimhammer 3: it doesn't change the victory goals.
+                    </div>
                 </div>
             )}
         </div>
@@ -154,6 +157,8 @@ function BestUnits({ lord, details, color, panel }) {
     const units = details.bestUnits ?? [];
     const own = units.filter((u) => u.own.length > 0);
     const shared = units.filter((u) => u.own.length === 0);
+    // Units only this lord's faction can field, named by his trait ("Unique unit: Immortulz").
+    const unique = (details.trait?.effects ?? []).filter((e) => /^Unique units?:/i.test(e)).map((e) => e.replace(/^Unique units?:\s*/i, ""));
     const sharedByRole = [];
     shared.forEach((u) => {
         let g = sharedByRole.find((x) => x.role === u.role);
@@ -163,10 +168,15 @@ function BestUnits({ lord, details, color, panel }) {
 
     return (
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {own.length > 0 && (
+            {(own.length > 0 || unique.length > 0) && (
                 <div style={{ ...panel, borderColor: `${color}60` }}>
                     <Label color={color}>Build around</Label>
-                    <div style={{ fontSize: 14, color: t.text1, lineHeight: 1.6 }}>{buildAround(own).join(" · ")}</div>
+                    {own.length > 0 && <div style={{ fontSize: 14, color: t.text1, lineHeight: 1.6 }}>{buildAround(own).join(" · ")}</div>}
+                    {unique.length > 0 && (
+                        <div style={{ fontSize: 13, color: t.text2, lineHeight: 1.6, marginTop: own.length > 0 ? 6 : 0 }}>
+                            <span style={{ color }}>★ Unique to {lord}:</span> {unique.join(" · ")}<Pill>{details.trait.name}</Pill>
+                        </div>
+                    )}
                 </div>
             )}
             <div style={panel}>
