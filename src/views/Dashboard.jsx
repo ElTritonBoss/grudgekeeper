@@ -147,7 +147,7 @@ function LordsPanel({ main, extras, allLords, detailsFor, onAdd, onAddMany, onRe
                     </div>
                 </div>
             ) : (
-                <LordDetails key={current.lordId} lord={current.lord} details={detailsFor(current.lordId)} color={color} showHeroes={!(heroesInRow && current.lordId === main.lordId)} />
+                <LordDetails key={current.lordId} lord={current.lord} details={detailsFor(current.lordId)} goals={current.goals} color={color} showHeroes={!(heroesInRow && current.lordId === main.lordId)} />
             )}
         </div>
     );
@@ -163,7 +163,7 @@ function ExtraLordsRow({ main, extras, detailsFor, color }) {
                     <div key={l.lordId} style={{ background: t.bg3, border: `1px solid ${color}30`, borderLeft: `3px solid ${color}90`, borderRadius: 10, padding: "14px 16px" }}>
                         <div style={{ fontSize: 17, color: t.text1, marginBottom: 2 }}>{l.lord}</div>
                         <div style={{ fontSize: 11, color: t.text4, marginBottom: 10 }}>{l.faction} · {l.dlcLabel}</div>
-                        <LordDetails lord={l.lord} details={detailsFor(l.lordId)} color={color} showHeroes={l.faction !== main.faction} />
+                        <LordDetails lord={l.lord} details={detailsFor(l.lordId)} goals={l.goals} color={color} showHeroes={l.faction !== main.faction} />
                     </div>
                 ))}
             </div>
